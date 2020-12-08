@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: @profileActive@
+  http:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
