@@ -28,7 +28,7 @@
                 <!--<setting name="logImpl" value="STDOUT_LOGGING" />-->
          </settings>
         <typeAliases>
-                <typeAlias type="com.zhuyinline.pets.crawler.entity.UserCert" alias="UserCert"/>
+                <typeAlias type="com.zhuayinline.pets.crawler.entity.PetsProduct" alias="UserCert"/>
 
         </typeAliases>
         <!-- Mybatis 分页插件  有空再集成 -->

@@ -1,4 +1,4 @@
-package com.zhuyinline.pets.crawler.vo;
+package com.zhuayinline.pets.crawler.vo;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;

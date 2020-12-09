@@ -1,4 +1,4 @@
-package com.zhuyinline.pets.crawler.config;
+package com.zhuayinline.pets.crawler.config;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;

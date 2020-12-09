@@ -1,4 +1,4 @@
-package com.zhuyinline.pets.crawler;
+package com.zhuayinline.pets.crawler;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,7 +9,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.zhuayinline.pets.crawler.*"})
-@MapperScan("com.lzx.crowdsourcing.dao")
+@MapperScan("com.zhuayinline.pets.crawler.dao")
 @EnableSwagger2
 @EnableScheduling
 public class PetsCrawlerApplication {

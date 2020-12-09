@@ -22,9 +22,9 @@ spring:
       poolPreparedStatements: true
       maxPoolPreparedStatementPerConnectionSize: 20     
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://47.104.243.254:3306/db_crowdsourcing?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&useAffectedRows=true&rewriteBatchedStatements=true
+      url: jdbc:mysql://106.13.19.170:3306/pets?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&useAffectedRows=true&rewriteBatchedStatements=true
       username: root
-      password: Leizx@818
+      password: devin@123
 mybatis:
 #  config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:mapper/*.xml

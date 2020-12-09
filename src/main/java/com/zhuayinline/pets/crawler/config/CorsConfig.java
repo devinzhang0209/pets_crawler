@@ -1,4 +1,4 @@
-package com.zhuyinline.pets.crawler.config;
+package com.zhuayinline.pets.crawler.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

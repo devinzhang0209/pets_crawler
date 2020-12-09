@@ -1,4 +1,4 @@
-package com.zhuyinline.pets.crawler.util;
+package com.zhuayinline.pets.crawler.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

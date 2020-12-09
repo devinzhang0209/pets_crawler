@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhuayinline.pets.crawler.dao.PetsProductMapper">
+    <resultMap id="BaseResultMap" type="com.zhuayinline.pets.crawler.entity.PetsProduct">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <id column="product_id" property="productId" jdbcType="VARCHAR"/>
+        <id column="source" property="source" jdbcType="VARCHAR"/>
+
+        <result column="category1" property="category1" jdbcType="VARCHAR"/>
+        <result column="category2" property="category2" jdbcType="VARCHAR"/>
+        <result column="category3" property="category3" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="product_link" property="productLink" jdbcType="VARCHAR"/>
+        <result column="product_image_link" property="productImageLink" jdbcType="VARCHAR"/>
+        <result column="product_unit" property="productUnit" jdbcType="VARCHAR"/>
+        <result column="product_specs" property="productSpecs" jdbcType="VARCHAR"/>
+
+
+        <result column="product_price" property="productPrice" jdbcType="DECIMAL"/>
+
+        <result column="product_brand" property="productBrand" jdbcType="VARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="VARCHAR"/>
+        <result column="last_updated_time" property="lastUpdatedTime" jdbcType="VARCHAR"/>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+   id,product_id,source,category1,category2,category3,product_name,product_link,product_image_link,product_unit,product_specs,product_price,product_brand,created_time,last_updated_time
+  </sql>
+
+</mapper>
