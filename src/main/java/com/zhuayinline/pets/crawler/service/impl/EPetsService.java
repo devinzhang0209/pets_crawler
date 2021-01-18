@@ -6,7 +6,7 @@ import com.zhuayinline.pets.crawler.vo.Category;
 
 import java.util.List;
 
-public class EPetsService implements IPetsCall {
+public class EPetsService extends IPetsCall {
     @Override
     public List<Category> getAllCategory() throws Exception {
         return null;
@@ -25,5 +25,15 @@ public class EPetsService implements IPetsCall {
     @Override
     public void search() throws Exception {
 
+    }
+
+    @Override
+    public String getSource() {
+        return null;
+    }
+
+    @Override
+    public String getCategoryBaseUrl() {
+        return null;
     }
 }

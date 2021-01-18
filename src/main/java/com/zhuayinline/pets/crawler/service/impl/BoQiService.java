@@ -7,6 +7,7 @@ import com.zhuayinline.pets.crawler.util.DateUtil;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
+import com.zhuayinline.pets.crawler.vo.Website;
 import org.apache.commons.collections.CollectionUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * @date 2020-12-9 09:13:03
  */
 @Service
-public class BoQiService implements IPetsCall {
+public class BoQiService extends IPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -39,14 +40,20 @@ public class BoQiService implements IPetsCall {
     private PetsProductMapper petsProductMapper;
 
 
-    private static final String SOURCE = "波奇网";
-    private static final String CATEGORY_BASE_URL = "http://shop.boqii.com/allsort.html";
+    @Override
+    public String getSource() {
+        return Website.BQ.getWebsiteName();
+    }
 
+    @Override
+    public String getCategoryBaseUrl() {
+        return Website.BQ.getBaseCategoryUrl();
+    }
 
     @Override
     public List<Category> getAllCategory() throws Exception {
         List<Category> categories = new LinkedList<>();
-        Document document = searchUtil.getDocument(CATEGORY_BASE_URL);
+        Document document = searchUtil.getDocument(getCategoryBaseUrl());
         Elements leftRightDocument = document.getElementsByClass("classify_h");
 
         for (int index = 0; index < 2; index++) {
@@ -138,7 +145,7 @@ public class BoQiService implements IPetsCall {
                 }
 
                 PetsProduct product = new PetsProduct();
-                product.setSource(SOURCE);
+                product.setSource(getSource());
                 product.setProductId(productId);
                 product.setCategory1(category.getCategory1());
                 product.setCategory2(category.getCategory2());
@@ -169,14 +176,14 @@ public class BoQiService implements IPetsCall {
                     List<PetsProduct> products = new LinkedList<>();
 
                     int pageSize = getCategoryProductCount(category.getCategoryLink());
-                    System.out.println("total page:"+pageSize);
+                    System.out.println("total page:" + pageSize);
                     System.out.println("begin to search the first page...");
                     //第一页
                     products.addAll(getProducts(category, category.getCategoryLink()));
 
                     if (pageSize > 1) {
                         for (int page = 2; page <= pageSize; page++) {
-                            System.out.println("begin to search the "+page+" page");
+                            System.out.println("begin to search the " + page + " page");
                             String firstPageUrl = category.getCategoryLink();
                             String pageLink = firstPageUrl.replaceAll(".html", "") + "-0-0-p" + page + ".html";
                             products.addAll(getProducts(category, pageLink));
