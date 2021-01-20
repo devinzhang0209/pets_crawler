@@ -94,7 +94,7 @@ public class BoQiService extends IPetsCall {
 
     @Override
     public int getCategoryProductCount(String categoryProductUrl) throws Exception {
-        Integer page = 0;
+        Integer page = 1;
         Document document = searchUtil.getDocument(categoryProductUrl);
         String totalPage = document.getElementsByClass("product_page_total").text();
         try {
@@ -144,23 +144,7 @@ public class BoQiService extends IPetsCall {
                     productId = productId.replaceAll(".html", "").replaceAll("-", "");
                 }
 
-                PetsProduct product = new PetsProduct();
-                product.setSource(getSource());
-                product.setProductId(productId);
-                product.setCategory1(category.getCategory1());
-                product.setCategory2(category.getCategory2());
-                product.setCategory3(category.getCategory3());
-                product.setProductName(productName);
-                product.setProductBrand(brand);
-                product.setProductUnit(productUnit);
-                product.setProductImageLink(imageLink);
-                product.setProductLink(productLink);
-                product.setProductPrice(new BigDecimal(productPrice));
-                product.setProductSpecs(productSpecs);
-                product.setCreatedTime(DateUtil.getNow());
-                product.setLastUpdatedTime(DateUtil.getNow());
-
-                System.out.println(product);
+                PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                 products.add(product);
             }
         }
@@ -170,47 +154,16 @@ public class BoQiService extends IPetsCall {
     @Override
     public void search() {
         try {
-            List<Category> allCategory = getAllCategory();
-            if (CollectionUtils.isNotEmpty(allCategory)) {
-                for (Category category : allCategory) {
-                    List<PetsProduct> products = new LinkedList<>();
-
-                    int pageSize = getCategoryProductCount(category.getCategoryLink());
-                    System.out.println("total page:" + pageSize);
-                    System.out.println("begin to search the first page...");
-                    //第一页
-                    products.addAll(getProducts(category, category.getCategoryLink()));
-
-                    if (pageSize > 1) {
-                        for (int page = 2; page <= pageSize; page++) {
-                            System.out.println("begin to search the " + page + " page");
-                            String firstPageUrl = category.getCategoryLink();
-                            String pageLink = firstPageUrl.replaceAll(".html", "") + "-0-0-p" + page + ".html";
-                            products.addAll(getProducts(category, pageLink));
-                        }
-                    }
-
-                    for (PetsProduct product : products) {
-                        Example example = new Example(PetsProduct.class);
-                        Example.Criteria criteria = example.createCriteria();
-                        criteria.andEqualTo("source", product.getSource());
-                        criteria.andEqualTo("productId", product.getProductId());
-                        PetsProduct one = petsProductMapper.selectOneByExample(example);
-                        if (one == null) {
-                            petsProductMapper.insertSelective(product);
-                        } else {
-                            product.setId(one.getId());
-                            product.setCreatedTime(one.getCreatedTime());
-                            petsProductMapper.updateByPrimaryKeySelective(product);
-                        }
-
-                    }
-
-                }
-            }
-
+            super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String getPageLink(int page, Category category) {
+        String firstPageUrl = category.getCategoryLink();
+        String pageLink = firstPageUrl.replaceAll(".html", "") + "-0-0-p" + page + ".html";
+        return pageLink;
     }
 }

@@ -3,7 +3,9 @@ package com.zhuayinline.pets.crawler.vo;
 public enum Website {
 
     BQ("波奇", "http://shop.boqii.com/allsort.html"),
-    EC("E宠", ""),
+    ECCAT("E宠", "https://cat.epet.com/"),
+    ECDOG("E宠", "https://www.epet.com/"),
+
     ZQW("最宠网", ""),
     CMT("萌宠堂", ""),
     TWLCWYPSC("20楼宠物用品商城", ""),

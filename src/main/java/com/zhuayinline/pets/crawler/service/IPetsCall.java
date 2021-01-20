@@ -1,9 +1,14 @@
 package com.zhuayinline.pets.crawler.service;
 
+import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.util.StringUtil;
+import com.zhuayinline.pets.crawler.util.DateUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
+import org.apache.commons.collections.CollectionUtils;
+import tk.mybatis.mapper.entity.Example;
 
+import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,7 +26,7 @@ public abstract class IPetsCall {
      *
      * @return map
      */
-   public abstract List<Category> getAllCategory() throws Exception;
+    public abstract List<Category> getAllCategory() throws Exception;
 
     /**
      * get category product count
@@ -33,17 +38,86 @@ public abstract class IPetsCall {
 
     public abstract List<PetsProduct> getProducts(Category category, String categoryProductUrl) throws Exception;
 
+
+    public abstract void search() throws Exception;
+
     /**
      * get the product list
      *
      * @throws Exception
      */
-    public abstract void search() throws Exception;
+    public void search(PetsProductMapper petsProductMapper) throws Exception {
+        try {
+            List<Category> allCategory = getAllCategory();
+            if (CollectionUtils.isNotEmpty(allCategory)) {
+                for (Category category : allCategory) {
+                    List<PetsProduct> products = new LinkedList<>();
 
-    public abstract String getSource() ;
+                    int pageSize = getCategoryProductCount(category.getCategoryLink());
+                    System.out.println("total page:" + pageSize);
+                    System.out.println("begin to search the first page...");
+                    //第一页
+                    products.addAll(getProducts(category, category.getCategoryLink()));
+
+                    if (pageSize > 1) {
+                        for (int page = 2; page <= pageSize; page++) {
+                            System.out.println("begin to search the " + page + " page");
+                            products.addAll(getProducts(category, getPageLink(page, category)));
+                        }
+                    }
+                    saveProduct(petsProductMapper, products);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public abstract String getPageLink(int page, Category category);
+
+    public abstract String getSource();
 
 
-    public abstract String getCategoryBaseUrl() ;
+    public abstract String getCategoryBaseUrl();
+
+    public void saveProduct(PetsProductMapper petsProductMapper, List<PetsProduct> products) {
+        for (PetsProduct product : products) {
+            Example example = new Example(PetsProduct.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("source", product.getSource());
+            criteria.andEqualTo("productId", product.getProductId());
+            PetsProduct one = petsProductMapper.selectOneByExample(example);
+            if (one == null) {
+                petsProductMapper.insertSelective(product);
+            } else {
+                product.setId(one.getId());
+                product.setCreatedTime(one.getCreatedTime());
+                petsProductMapper.updateByPrimaryKeySelective(product);
+            }
+
+        }
+    }
+
+    public PetsProduct buildProduct(String productId, Category category, String productName, String brand, String productUnit, String imageLink, String productLink, String productPrice, String productSpecs) {
+        PetsProduct product = new PetsProduct();
+        product.setSource(getSource());
+        product.setProductId(productId);
+        product.setCategory1(category.getCategory1());
+        product.setCategory2(category.getCategory2());
+        product.setCategory3(category.getCategory3());
+        product.setProductName(productName);
+        product.setProductBrand(brand);
+        product.setProductUnit(productUnit);
+        product.setProductImageLink(imageLink);
+        product.setProductLink(productLink);
+        product.setProductPrice(new BigDecimal(productPrice));
+        product.setProductSpecs(productSpecs);
+        product.setCreatedTime(DateUtil.getNow());
+        product.setLastUpdatedTime(DateUtil.getNow());
+        System.out.println(product);
+        return product;
+    }
 
 }
 

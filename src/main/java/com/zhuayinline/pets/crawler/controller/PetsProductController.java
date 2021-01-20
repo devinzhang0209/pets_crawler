@@ -1,6 +1,7 @@
 package com.zhuayinline.pets.crawler.controller;
 
 import com.zhuayinline.pets.crawler.service.impl.BoQiService;
+import com.zhuayinline.pets.crawler.service.impl.EPetsService;
 import com.zhuayinline.pets.crawler.vo.Result;
 import io.swagger.annotations.Api;
 import org.springframework.stereotype.Controller;
@@ -23,10 +24,18 @@ public class PetsProductController {
 
     @Resource
     private BoQiService boQiService;
+    @Resource
+    private EPetsService ePetsService;
 
     @GetMapping("/boqi")
     public String callBoQi() {
         boQiService.search();
+        return Result.succResult(null);
+    }
+
+    @GetMapping("/ec")
+    public String callEC() throws Exception {
+        ePetsService.search();
         return Result.succResult(null);
     }
 
