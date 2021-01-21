@@ -7,7 +7,7 @@ public enum Website {
     ECDOG("E宠", "https://www.epet.com/"),
 
     ZQW("最宠网", ""),
-    CMT("萌宠堂", ""),
+    MCT("萌宠堂", "https://www.mengchongtang.com/catalog.php"),
     TWLCWYPSC("20楼宠物用品商城", ""),
     CWSC("宠物商城", ""),
     TAOBAO("淘宝", ""),
