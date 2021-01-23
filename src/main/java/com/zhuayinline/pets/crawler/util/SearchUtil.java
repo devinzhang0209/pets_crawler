@@ -26,7 +26,7 @@ public class SearchUtil {
             "Mozilla/5.0 (Windows NT 6.1; W…) Gecko/20100101 Firefox/60.0"};
 
     public Document getDocument(String url) throws Exception {
-        Document document ;
+        Document document = null;
         Random r = new Random();
         int i = r.nextInt(14);
 
@@ -34,15 +34,21 @@ public class SearchUtil {
             document = Jsoup
                     .connect(url)
                     .userAgent(ua[i])
+                    .referrer(IpUtil.randIP())
                     .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36")
                     .get();
         } catch (Exception e) {
-            Thread.sleep(2000);
-            document = Jsoup
-                    .connect(url)
-                    .userAgent(ua[i])
-                    .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36")
-                    .get();
+            try {
+                Thread.sleep(2000);
+                document = Jsoup
+                        .connect(url)
+                        .userAgent(ua[i])
+                        .referrer(IpUtil.randIP())
+                        .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36")
+                        .get();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         }
         return document;
     }

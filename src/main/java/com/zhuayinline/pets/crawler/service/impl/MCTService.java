@@ -74,11 +74,9 @@ public class MCTService extends IPetsCall {
                             continue;
                         }
                         String categoryLink = secondDocs.get(k).attr("href");
-                        Category category = new Category();
-                        category.setCategory1(category1);
-                        category.setCategory2(category2);
-                        category.setCategory3(category3);
-                        category.setCategoryLink(categoryLink);
+                        Category category = buildCategory(category1, category2, category3, categoryLink);
+
+
                         System.out.println(String.format("%s,%s,%s,%s", category1, category2, category3, categoryLink));
 
                         categories.add(category);

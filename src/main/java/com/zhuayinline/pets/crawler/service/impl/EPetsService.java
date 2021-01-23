@@ -57,10 +57,8 @@ public class EPetsService extends IPetsCall {
             String categoryName = elements.get(i).text();
             System.out.println(String.format("EC: category:%s , categoryLink:%s", categoryName, categoryLink));
 
-            Category category = new Category();
-            category.setCategoryLink(categoryLink);
-            category.setCategory1(category1);
-            category.setCategory2(categoryName);
+            Category category = buildCategory(category1, categoryName, StringUtil.EMPTY, categoryLink);
+
             categories.add(category);
         }
     }
@@ -152,7 +150,7 @@ public class EPetsService extends IPetsCall {
                             productImage = productList.get(i).getElementsByClass("gd-photoimg").get(0).attr("src0");
                         }
                     }
-                    if(StringUtil.isEmpty(productImage)){
+                    if (StringUtil.isEmpty(productImage)) {
                         System.out.println();
                     }
                     brand = productDocument.getElementsByClass("fontline fl").get(0).text();

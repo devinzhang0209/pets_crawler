@@ -99,6 +99,15 @@ public abstract class IPetsCall {
         }
     }
 
+    public Category buildCategory(String category1, String category2, String category3, String categoryLink) {
+        Category category = new Category();
+        category.setCategory1(category1);
+        category.setCategory2(category2);
+        category.setCategory3(category3);
+        category.setCategoryLink(categoryLink);
+        return category;
+    }
+
     public PetsProduct buildProduct(String productId, Category category, String productName, String brand, String productUnit, String imageLink, String productLink, String productPrice, String productSpecs) {
         PetsProduct product = new PetsProduct();
         product.setSource(getSource());
