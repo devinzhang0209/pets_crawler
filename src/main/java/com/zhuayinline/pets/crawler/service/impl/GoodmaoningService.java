@@ -143,7 +143,7 @@ public class GoodmaoningService extends IPetsCall {
                         productPrice = priceSource;
                     }
                     String productSpecs = StringUtil.EMPTY;
-                    Elements goodsSku = productDocument.getElementsByClass("goods_sku");
+                    Elements goodsSku = productDocument.getElementsByClass("goods_sku f_v tb-selected");
                     if (CollectionUtils.isNotEmpty(goodsSku)) {
                         try {
                             productSpecs = goodsSku.text();
@@ -151,15 +151,21 @@ public class GoodmaoningService extends IPetsCall {
 
                         }
                     }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        //从产品名称中取产品规格
-                        String units = "kg|KG|g|千克|克|磅|G|cm|CM|w|W|ml|包";
-                        String patternStr = "[0-9]*(" + units + ")";
-                        Pattern pattern = Pattern.compile(patternStr);
-                        Matcher matcher = pattern.matcher(productName);
-                        if (matcher.find()) {
-                            productSpecs = matcher.group();
-                        }
+
+                    //从产品名称中取产品规格
+                    String finder = StringUtil.EMPTY;
+                    String units = "kg|KG|g|千克|克|磅|G|cm|CM|w|W|ml|包";
+                    String patternStr = "(\\d*\\.)?[0-9]+(" + units + ")";
+                    Pattern pattern = Pattern.compile(patternStr);
+                    Matcher matcher = pattern.matcher(productName);
+                    if (matcher.find()) {
+                        finder = matcher.group();
+                    }
+
+                    if (StringUtil.isEmpty(productSpecs)
+                            || StringUtil.isNotEmpty(finder)
+                            || productSpecs.trim().equalsIgnoreCase("w")) {
+                        productSpecs = finder;
                     }
                     String productUnit = productSpecs;
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
