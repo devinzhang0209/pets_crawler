@@ -90,7 +90,8 @@ public class BoQiService extends IPetsCall {
     }
 
     @Override
-    public int getCategoryProductCount(String categoryProductUrl) throws Exception {
+    public Object[] getCategoryProductCount(String categoryProductUrl) throws Exception {
+        Object[] objs = new Object[2];
         Integer page = 1;
         Document document = searchUtil.getDocument(categoryProductUrl);
         String totalPage = document.getElementsByClass("product_page_total").text();
@@ -99,7 +100,8 @@ public class BoQiService extends IPetsCall {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return page;
+        objs[0] = page;
+        return objs;
     }
 
     @Override
@@ -158,7 +160,7 @@ public class BoQiService extends IPetsCall {
     }
 
     @Override
-    public String getPageLink(int page, Category category) {
+    public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String pageLink = firstPageUrl.replaceAll(".html", "") + "-0-0-p" + page + ".html";
         return pageLink;

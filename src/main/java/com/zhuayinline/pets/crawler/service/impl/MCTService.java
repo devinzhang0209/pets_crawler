@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,7 +90,8 @@ public class MCTService extends IPetsCall {
     }
 
     @Override
-    public int getCategoryProductCount(String categoryProductUrl) throws Exception {
+    public Object[] getCategoryProductCount(String categoryProductUrl) throws Exception {
+        Object[] objs = new Object[2];
         Integer page = 1;
         Document document = searchUtil.getDocument(categoryProductUrl);
         String totalPage = document.getElementsByClass("txt").text().replaceAll("1/", "");
@@ -98,7 +100,8 @@ public class MCTService extends IPetsCall {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return page;
+        objs[0] = page;
+        return objs;
     }
 
     @Override
@@ -156,7 +159,7 @@ public class MCTService extends IPetsCall {
     }
 
     @Override
-    public String getPageLink(int page, Category category) {
+    public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String pageLink = firstPageUrl + "&page=" + page;
         return pageLink;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +65,8 @@ public class EPetsService extends IPetsCall {
     }
 
     @Override
-    public int getCategoryProductCount(String categoryProductUrl) throws Exception {
+    public Object[] getCategoryProductCount(String categoryProductUrl) throws Exception {
+        Object[] objs = new Object[2];
         Integer page = 0;
         Document document = searchUtil.getDocument(categoryProductUrl);
         String text = document.getElementsByClass("last").text();
@@ -96,8 +98,8 @@ public class EPetsService extends IPetsCall {
             e.printStackTrace();
         }
         System.out.println(String.format("category:%s,pageCount :%s", categoryProductUrl, page));
-
-        return page;
+        objs[0] = page;
+        return objs;
     }
 
     @Override
@@ -183,7 +185,7 @@ public class EPetsService extends IPetsCall {
     }
 
     @Override
-    public String getPageLink(int page, Category category) {
+    public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String nextPage = firstPageUrl.replaceAll(".html", "") + "b1f" + page + ".html";
         return nextPage;

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Devin Zhang
@@ -74,17 +75,28 @@ public class TwentyFloorService extends IPetsCall {
     }
 
     @Override
-    public int getCategoryProductCount(String categoryProductUrl) throws Exception {
+    public Object[] getCategoryProductCount(String categoryProductUrl) throws Exception {
+        Object[] objs = new Object[2];
         Integer page = 1;
+        String pageLink = StringUtil.EMPTY;
         //pageTotal
         Document document = searchUtil.getDocument(categoryProductUrl);
         String totalPage = document.getElementsByClass("pageTotal").text().replaceAll("/", "");
         try {
             page = Integer.parseInt(totalPage);
+            Elements pageDiv = document.getElementsByClass("g_border js_pagination");
+            if (CollectionUtils.isNotEmpty(pageDiv)) {
+                String page2Link = pageDiv.get(0).attr("href");
+                if (StringUtil.isNotEmpty(page2Link)) {
+                    pageLink = Website.TWLCWYPSC.getBaseCategoryUrl() + page2Link;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return page;
+        objs[0] = page;
+        objs[1] = pageLink;
+        return objs;
     }
 
     @Override
@@ -168,9 +180,16 @@ public class TwentyFloorService extends IPetsCall {
     }
 
     @Override
-    public String getPageLink(int page, Category category) {
-        String firstPageUrl = category.getCategoryLink();
-        String pageLink = firstPageUrl + "&page=" + page;
+    public String getPageLink(int page, Category category, Map<String, String> otherParams) {
+        String pageLink = StringUtil.EMPTY;
+        try {
+            if (null != otherParams) {
+                pageLink = otherParams.get("pageLink");
+                pageLink = pageLink.replaceAll("pageno=2", "pageno=" + page);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return pageLink;
     }
 }

@@ -3,13 +3,16 @@ package com.zhuayinline.pets.crawler.service;
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
 import com.zhuayinline.pets.crawler.util.DateUtil;
+import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
 import org.apache.commons.collections.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author devin
@@ -33,7 +36,7 @@ public abstract class IPetsCall {
      *
      * @return int
      */
-    public abstract int getCategoryProductCount(String categoryProductUrl) throws Exception;
+    public abstract Object[] getCategoryProductCount(String categoryProductUrl) throws Exception;
 
 
     public abstract List<PetsProduct> getProducts(Category category, String categoryProductUrl) throws Exception;
@@ -53,16 +56,27 @@ public abstract class IPetsCall {
                 for (Category category : allCategory) {
                     List<PetsProduct> products = new LinkedList<>();
 
-                    int pageSize = getCategoryProductCount(category.getCategoryLink());
+                    Object[] pageInfo = getCategoryProductCount(category.getCategoryLink());
+                    int pageSize = (int) pageInfo[0];
+                    String pageLink = StringUtil.EMPTY;
+                    if (pageInfo.length == 2) {
+                        pageLink = (String) pageInfo[1];
+                    }
                     System.out.println("total page:" + pageSize);
                     System.out.println("begin to search the first page...");
                     //第一页
                     products.addAll(getProducts(category, category.getCategoryLink()));
 
                     if (pageSize > 1) {
+                        //for 20floor
+                        Map<String, String> otherParams = new HashMap();
+                        if (StringUtil.isNotEmpty(pageLink)) {
+                            otherParams.put("pageLink", pageLink);
+                        }
+
                         for (int page = 2; page <= pageSize; page++) {
                             System.out.println("begin to search the " + page + " page");
-                            products.addAll(getProducts(category, getPageLink(page, category)));
+                            products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
                         }
                     }
                     saveProduct(petsProductMapper, products);
@@ -74,7 +88,7 @@ public abstract class IPetsCall {
         }
     }
 
-    public abstract String getPageLink(int page, Category category);
+    public abstract String getPageLink(int page, Category category, Map<String, String> otherParams);
 
     public abstract String getSource();
 

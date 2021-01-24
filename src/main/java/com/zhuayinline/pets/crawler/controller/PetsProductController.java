@@ -1,10 +1,7 @@
 package com.zhuayinline.pets.crawler.controller;
 
 import com.zhuayinline.pets.crawler.service.IPetsCall;
-import com.zhuayinline.pets.crawler.service.impl.BoQiService;
-import com.zhuayinline.pets.crawler.service.impl.EPetsService;
-import com.zhuayinline.pets.crawler.service.impl.MCTService;
-import com.zhuayinline.pets.crawler.service.impl.TwentyFloorService;
+import com.zhuayinline.pets.crawler.service.impl.*;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Result;
 import com.zhuayinline.pets.crawler.vo.Website;
@@ -35,6 +32,8 @@ public class PetsProductController {
     private MCTService mctService;
     @Resource
     private TwentyFloorService twentyFloorService;
+    @Resource
+    private GoodmaoningService goodmaoningService;
 
     @GetMapping("/begin")
     public String callBoQi(String action) throws Exception {
@@ -51,6 +50,8 @@ public class PetsProductController {
             service = mctService;
         } else if (action.equalsIgnoreCase(Website.TWLCWYPSC.name())) {
             service = twentyFloorService;
+        } else if (action.equalsIgnoreCase(Website.CWSC.name())) {
+            service = goodmaoningService;
         }
         if (null == service) {
             return Result.failResult("action not found");
