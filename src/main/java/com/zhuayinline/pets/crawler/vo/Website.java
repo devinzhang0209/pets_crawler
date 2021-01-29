@@ -11,9 +11,9 @@ public enum Website {
     CWSC("宠物商城", "https://www.goodmaoning.com/", "https://www.goodmaoning.com/brand_index.html"),
     TAOBAO("淘宝", "", ""),
     TMALL("天猫", "", ""),
-    ALIBABA("阿里巴巴", "", ""),
+    ALIBABA("阿里巴巴", "https://1688.com", "https://p4psearch.1688.com/p4p114/p4psearch/offer.htm?keywords=replacehere&cosite=&location=&trackid=&spm=a2609.11209760.j3f8podl.e5rt432e&keywordid="),
     JD("京东", "", ""),
-    SUNING("苏宁", "", ""),
+    SUNING("苏宁", "https://suning.com/", "https://list.suning.com/"),
     DANGDANG("当当", "", "");
 
     Website(String websiteName, String websiteUrl, String baseCategoryUrl) {

@@ -34,6 +34,10 @@ public class PetsProductController {
     private TwentyFloorService twentyFloorService;
     @Resource
     private GoodmaoningService goodmaoningService;
+    @Resource
+    private SuningService suningService;
+    @Resource
+    private AlibabaService alibabaService;
 
     @GetMapping("/begin")
     public String callBoQi(String action) throws Exception {
@@ -52,6 +56,10 @@ public class PetsProductController {
             service = twentyFloorService;
         } else if (action.equalsIgnoreCase(Website.CWSC.name())) {
             service = goodmaoningService;
+        } else if (action.equalsIgnoreCase(Website.SUNING.name())) {
+            service = suningService;
+        } else if (action.equalsIgnoreCase(Website.ALIBABA.name())) {
+            service = alibabaService;
         }
         if (null == service) {
             return Result.failResult("action not found");
