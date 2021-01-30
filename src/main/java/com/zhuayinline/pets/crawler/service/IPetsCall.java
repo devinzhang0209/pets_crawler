@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public abstract class IPetsCall {
 
+    public static final String HTTPS = "https:";
+
     private String source;
     private String categoryBaseUrl;
 
@@ -134,7 +136,7 @@ public abstract class IPetsCall {
         product.setProductUnit(productUnit);
         product.setProductImageLink(imageLink);
         product.setProductLink(productLink);
-        product.setProductPrice(new BigDecimal(productPrice));
+        product.setProductPrice(new BigDecimal(StringUtil.isEmpty(productPrice) ? "0" : productPrice));
         product.setProductSpecs(productSpecs);
         product.setCreatedTime(DateUtil.getNow());
         product.setLastUpdatedTime(DateUtil.getNow());

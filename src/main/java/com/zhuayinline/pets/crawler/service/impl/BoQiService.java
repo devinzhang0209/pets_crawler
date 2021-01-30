@@ -78,7 +78,7 @@ public class BoQiService extends IPetsCall {
                     for (int j = 0; j < category3Nodes.size(); j++) {
                         category3 = category3Nodes.get(j).text();
                         categoryProductLink = category3Nodes.get(j).attr("href");
-                        String link = "https:" + categoryProductLink;
+                        String link = HTTPS + categoryProductLink;
                         Category category = buildCategory(category1, category2, category3, link);
                         categories.add(category);
                         System.out.println(String.format("%s,%s,%s,%s", category1, category2, category3, categoryProductLink));

@@ -112,7 +112,6 @@ public class SuningService extends IPetsCall {
 
     @Override
     public List<PetsProduct> getProducts(Category category, String categoryProductUrl) throws Exception {
-        final String https = "https:";
         List<PetsProduct> products = new LinkedList<>();
 
         Document document = searchUtil.getDocument(categoryProductUrl);
@@ -121,8 +120,8 @@ public class SuningService extends IPetsCall {
             for (Element element : productList) {
                 String productId = element.attr("id");
                 Element element1 = element.getElementsByClass("img-block").get(0);
-                String productLink = https + element1.select("a").attr("href");
-                String imageLink = https + element1.select("a img").attr("src");
+                String productLink = HTTPS + element1.select("a").attr("href");
+                String imageLink = HTTPS + element1.select("a img").attr("src");
                 String productName = element1.select("a img").attr("alt");
 
                 if (StringUtil.isNotEmpty(productLink)) {
