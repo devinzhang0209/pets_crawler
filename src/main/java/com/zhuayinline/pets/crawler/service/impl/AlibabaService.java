@@ -193,7 +193,9 @@ public class AlibabaService extends IPetsCall {
 
     @Override
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
-        return PAGE_JSON_REQUEST.replaceAll("replacePage", page + "")
+        String pageLink = PAGE_JSON_REQUEST.replaceAll("replacePage", page + "")
                 .replaceAll("replaceKeywords", category.getCategory2());
+        System.out.println(String.format("pageLink:%s", pageLink));
+        return pageLink;
     }
 }

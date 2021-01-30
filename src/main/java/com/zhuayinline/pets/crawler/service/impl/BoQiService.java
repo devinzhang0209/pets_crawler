@@ -163,6 +163,7 @@ public class BoQiService extends IPetsCall {
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String pageLink = firstPageUrl.replaceAll(".html", "") + "-0-0-p" + page + ".html";
+        System.out.println(String.format("pageLink:%s", pageLink));
         return pageLink;
     }
 }

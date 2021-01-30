@@ -23,12 +23,12 @@ import java.util.Map;
 
 /**
  * @author Devin Zhang
- * @className SuningService
+ * @className DangdangService
  * @description TODO
- * @date 2021-1-24 11:44:32
+ * @date 2021-1-29 17:56:36
  */
 @Service
-public class SuningService extends IPetsCall {
+public class DangdangService extends IPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -42,54 +42,50 @@ public class SuningService extends IPetsCall {
 
     @Override
     public String getSource() {
-        return Website.SUNING.getWebsiteName();
+        return Website.DANGDANG.getWebsiteName();
     }
 
     @Override
     public String getCategoryBaseUrl() {
-        return Website.SUNING.getBaseCategoryUrl();
+        return Website.DANGDANG.getBaseCategoryUrl();
     }
 
     @Override
     public List<Category> getAllCategory() throws Exception {
         List<Category> categories = new LinkedList<>();
         Document document = searchUtil.getDocument(getCategoryBaseUrl());
-        Elements rootCategoryElement = document.getElementsByClass("search-main introduce clearfix").get(0).children();
+        Elements rootCategoryElement = document.getElementsByClass("classify_books");
 
         for (int index = 0; index < rootCategoryElement.size(); index++) {
 
             Element categoryDoc = rootCategoryElement.get(index);
-            String category1 = categoryDoc.select("h2").text();
+            String category1 = categoryDoc.select("h3[class='classify_title']").text();
 
             String category2;
             String category3;
 
-            Elements subCategory = categoryDoc.getElementsByClass("title-box");
-            for (int j = 0; j < subCategory.size(); j++) {
-                Elements secondCategoryDoc = subCategory.get(j).getElementsByClass("t-left");
-                if (secondCategoryDoc.size() == 0) {
-                    continue;
-                }
-                category2 = secondCategoryDoc.get(0).text();
-                Elements thirdCategoryDoc = subCategory.get(j).getElementsByClass("t-right");
-                if (CollectionUtils.isNotEmpty(thirdCategoryDoc) && CollectionUtils.isNotEmpty(thirdCategoryDoc.get(0).children())) {
-                    Elements children = thirdCategoryDoc.get(0).children();
-                    for (Element element : children) {
+            Elements secondDocs = categoryDoc.getElementsByClass("classify_kind");
+            for (Element secondDoc : secondDocs) {
+                category2 = secondDoc.getElementsByClass("classify_kind_name").text();
+                Elements thirdCategoryDoc = secondDoc.select("ul[class='classify_kind_detail'] li");
+                if (CollectionUtils.isNotEmpty(thirdCategoryDoc)) {
+                    for (Element element : thirdCategoryDoc) {
                         category3 = element.text();
-                        String categoryLink = Website.SUNING.getBaseCategoryUrl() + element.attr("href");
-
+                        String categoryLink = element.select("a").attr("href");
                         if (category1.contains(PETSKEYWORKDS)
                                 || category2.contains(PETSKEYWORKDS)
                                 || category2.contains(PETSKEYWORKDS)) {
-                            Category category = buildCategory(category1, category2, category3, categoryLink);
-                            categories.add(category);
+                            if (categoryLink.contains(".html")) {
+                                Category category = buildCategory(category1, category2, category3, categoryLink);
+                                categories.add(category);
+                            }
                         }
                     }
                 }
-
             }
-        }
 
+
+        }
         return categories;
     }
 
@@ -99,9 +95,8 @@ public class SuningService extends IPetsCall {
         Integer page = 1;
         Document document = searchUtil.getDocument(categoryProductUrl);
         try {
-            String totalPage = document.getElementsByClass("fl").get(0).text()
-                    .replaceAll("1/", "")
-                    .replaceAll("1 /", "").trim();
+            String totalPage = document.getElementsByClass("data").text();
+            totalPage = totalPage.replaceAll("1/", "").trim();
             page = Integer.parseInt(totalPage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,66 +107,46 @@ public class SuningService extends IPetsCall {
 
     @Override
     public List<PetsProduct> getProducts(Category category, String categoryProductUrl) throws Exception {
-        final String https = "https:";
         List<PetsProduct> products = new LinkedList<>();
 
         Document document = searchUtil.getDocument(categoryProductUrl);
-        if (CollectionUtils.isNotEmpty(document.getElementsByClass("product-list"))) {
-            Elements productList = document.getElementsByClass("item-wrap");
+        if (CollectionUtils.isNotEmpty(document.getElementsByClass("bigimg cloth_shoplist"))
+                && CollectionUtils.isNotEmpty(document.getElementsByClass("bigimg cloth_shoplist").get(0).children())) {
+            Elements productList = document.getElementsByClass("bigimg cloth_shoplist").get(0).children();
             for (Element element : productList) {
                 String productId = element.attr("id");
-                Element element1 = element.getElementsByClass("img-block").get(0);
-                String productLink = https + element1.select("a").attr("href");
-                String imageLink = https + element1.select("a img").attr("src");
-                String productName = element1.select("a img").attr("alt");
+                String productLink = element.select("a").attr("href");
+                String imageLink = element.select("a img").attr("data-original");
+                String productName = element.select("a").attr("title");
 
                 if (StringUtil.isNotEmpty(productLink)) {
                     Document productDocument = searchUtil.getDocument(productLink);
-                    Thread.sleep(5 * 1000);
                     if (productDocument == null) {
                         continue;
                     }
-                    int begin = productLink.indexOf(".com") + 5;
-                    int end = productLink.indexOf(".html");
-                    String subString = productLink.substring(begin, end);
-
-                    String pId1 = subString.split("/")[0];
-                    String pId2 = subString.split("/")[1];
-
-                    String productPriceLink = SUNNING_PRICE_URL;
-                    productPriceLink = productPriceLink.replaceAll("PID1", pId1).replaceAll("PID2", pId2);
-
-                    String priceText = HttpUtil.doGET(productPriceLink);
-                    if (StringUtil.isEmpty(priceText)) {
-                        continue;
-                    }
-
-                    int begin1 = priceText.indexOf("(") + 1;
-                    String priceJsonStr = priceText.substring(begin1, priceText.length() - 2);
-                    JSONArray jsonObj = (JSONArray) JSONObject.parse(priceJsonStr);
-                    if (jsonObj == null || jsonObj.size() == 0) {
-                        continue;
-                    }
-
-                    String productPrice = ((JSONObject) jsonObj.get(0)).getString("price");
-                    Thread.sleep(5 * 1000);
-                    if (StringUtil.isEmpty(productPrice)) {
-                        productPrice = "0";
+                    String productPrice = StringUtil.EMPTY;
+                    if (element.getElementsByClass("price_n") != null) {
+                        String price_n = element.getElementsByClass("price_n").text();
+                        productPrice = price_n.replaceAll("¥", "");
                     }
                     String brand = StringUtil.EMPTY;
                     String brands = "品牌";
                     String model = "适用";
-                    String model2 = "尺码";
+                    String model2 = "种类";
 
                     String productSpecs = StringUtil.EMPTY;
-                    if (productDocument.getElementsByClass("cnt clearfix") != null) {
-                        Elements fontDoc = productDocument.select("ul[class=cnt clearfix] li");
+                    if (productDocument.getElementsByClass("pro_content") != null) {
+                        Elements fontDoc = productDocument.select("ul[class=key clearfix] li");
                         for (int i = 0; i < fontDoc.size(); i++) {
                             String text = fontDoc.get(i).text();
                             if (StringUtil.isEmpty(text)) {
                                 continue;
                             }
-                            String value = fontDoc.get(i).attr("title");
+                            String value = StringUtil.EMPTY;
+                            Elements valueElement = fontDoc.get(i).select("a");
+                            if (CollectionUtils.isNotEmpty(valueElement)) {
+                                value = valueElement.text();
+                            }
                             if (text.contains(brands)) {
                                 brand = value;
                             }
@@ -181,22 +156,8 @@ public class SuningService extends IPetsCall {
                         }
 
                     }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        Elements selected = productDocument.getElementsByClass("clr-item selected");
-                        if (CollectionUtils.isNotEmpty(selected)) {
-                            productSpecs = selected.text();
-                        }
-                    }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        Elements selected = productDocument.getElementsByClass("selected");
-                        if (CollectionUtils.isNotEmpty(selected)) {
-                            productSpecs = selected.text();
-                        }
-                    }
-                    String productUnit = StringUtil.EMPTY;
-                    if (StringUtil.isNotEmpty(productSpecs)) {
-                        productUnit = productSpecs;
-                    }
+
+                    String productUnit = productSpecs;
 
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     products.add(product);
@@ -219,8 +180,8 @@ public class SuningService extends IPetsCall {
     @Override
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
-        String pageLink = firstPageUrl.replaceAll("0.html", (page - 1) + ".html");
-        System.out.println(String.format("pageLink:%s", pageLink));
+        String pageLink = firstPageUrl.replaceAll("dangdang.com/", "dangdang.com/pg" + page + "-");
+        System.out.println(String.format("pageLink:%s",pageLink));
         return pageLink;
     }
 }

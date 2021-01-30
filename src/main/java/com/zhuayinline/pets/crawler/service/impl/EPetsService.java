@@ -186,6 +186,7 @@ public class EPetsService extends IPetsCall {
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String nextPage = firstPageUrl.replaceAll(".html", "") + "b1f" + page + ".html";
+        System.out.println(String.format("pageLink:%s", nextPage));
         return nextPage;
     }
 

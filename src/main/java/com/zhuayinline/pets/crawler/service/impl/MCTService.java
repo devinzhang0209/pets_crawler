@@ -162,6 +162,7 @@ public class MCTService extends IPetsCall {
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String pageLink = firstPageUrl + "&page=" + page;
+        System.out.println(String.format("pageLink:%s", pageLink));
         return pageLink;
     }
 }

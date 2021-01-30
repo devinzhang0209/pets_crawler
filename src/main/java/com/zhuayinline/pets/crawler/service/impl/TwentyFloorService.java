@@ -190,6 +190,7 @@ public class TwentyFloorService extends IPetsCall {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(String.format("pageLink:%s", pageLink));
         return pageLink;
     }
 }

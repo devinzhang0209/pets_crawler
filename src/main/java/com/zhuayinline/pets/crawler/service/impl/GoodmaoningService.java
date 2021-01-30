@@ -193,6 +193,7 @@ public class GoodmaoningService extends IPetsCall {
         } else {
             pageLink = pageLink + "&page=" + page;
         }
+        System.out.println(String.format("pageLink:%s", pageLink));
         return pageLink;
     }
 }

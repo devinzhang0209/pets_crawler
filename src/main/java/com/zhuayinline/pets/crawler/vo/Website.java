@@ -14,7 +14,7 @@ public enum Website {
     ALIBABA("阿里巴巴", "https://1688.com", "https://p4psearch.1688.com/p4p114/p4psearch/offer.htm?keywords=replacehere&cosite=&location=&trackid=&spm=a2609.11209760.j3f8podl.e5rt432e&keywordid="),
     JD("京东", "", ""),
     SUNING("苏宁", "https://suning.com/", "https://list.suning.com/"),
-    DANGDANG("当当", "", "");
+    DANGDANG("当当", "http://dangdang.com/", "http://category.dangdang.com/");
 
     Website(String websiteName, String websiteUrl, String baseCategoryUrl) {
         this.websiteName = websiteName;
