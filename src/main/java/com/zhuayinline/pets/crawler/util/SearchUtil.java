@@ -18,6 +18,7 @@ public class SearchUtil {
             "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
             "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)",
             "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0)",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 BIDUBrowser/8.3 Safari/537.36",
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36 Core/1.47.277.400 QQBrowser/9.4.7658.400",
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 UBrowser/5.6.12150.8 Safari/537.36",
@@ -36,7 +37,7 @@ public class SearchUtil {
             }
         }
         try {
-            Thread.sleep(3 * 1000);
+            Thread.sleep(2 * 1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,5 +59,16 @@ public class SearchUtil {
             e.printStackTrace();
         }
         return document;
+    }
+
+    private Document buildDocumentByHttpClient(String url) {
+        Document doc = null;
+        try {
+            String s = HttpUtil.doGET(url);
+            doc = Jsoup.parse(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return doc;
     }
 }

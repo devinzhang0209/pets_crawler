@@ -3,11 +3,14 @@ package com.zhuayinline.pets.crawler.service.impl;
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
 import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
+import com.zhuayinline.pets.crawler.util.HttpUtil;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
 import com.zhuayinline.pets.crawler.vo.Website;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.client.methods.HttpGet;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -48,7 +51,7 @@ public class TmallService extends AbstractPetsCall {
     public List<Category> getAllCategory() throws Exception {
         List<Category> categories = new LinkedList<>();
         Document document = searchUtil.getDocument(getCategoryBaseUrl());
-        Elements rootCategoryElement = document.getElementsByClass("j_MenuNav nav-item a");
+        Elements rootCategoryElement = document.getElementsByClass("j_MenuNav").select("a");
 
         for (int index = 0; index < rootCategoryElement.size(); index++) {
 
@@ -57,7 +60,7 @@ public class TmallService extends AbstractPetsCall {
             String category2 = categoryDoc.text();
             if (StringUtil.isNotEmpty(category2) && category2.contains(category1)) {
                 String category3 = "宠物食品及用品";
-                String categoryLink = categoryDoc.attr("href");
+                String categoryLink = HTTPS + categoryDoc.attr("href");
                 Category category = buildCategory(category1, category2, category3, categoryLink);
                 categories.add(category);
             }
@@ -69,11 +72,16 @@ public class TmallService extends AbstractPetsCall {
     public Object[] getCategoryProductCount(String categoryProductUrl) throws Exception {
         Object[] objs = new Object[2];
         Integer page = 1;
-        Document document = searchUtil.getDocument(categoryProductUrl);
         try {
-            String totalPage = document.getElementsByClass("ui-page-s-len").text();
-            totalPage = totalPage.replaceAll("1/", "").trim();
-            page = Integer.parseInt(totalPage);
+            String s = HttpUtil.doGET(categoryProductUrl);
+            Document doc = Jsoup.parse(s);
+            String pageStr = doc.getElementsByAttributeValueContaining("name", "totalPage").val();
+            if (StringUtil.isEmpty(pageStr)) {
+                page = 80;
+            } else {
+                page = Integer.parseInt(pageStr);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -32,7 +32,7 @@ public class TaobaoService extends AbstractPetsCall {
     @Autowired
     private PetsProductMapper petsProductMapper;
 
-    private static final String BASEPAGELINK = "https://list.tmall.com/search_product.htm";
+    private static final String BASEPAGELINK = "https://s.taobao.com/search?q=";
 
     @Override
     public String getSource() {
@@ -47,27 +47,14 @@ public class TaobaoService extends AbstractPetsCall {
     @Override
     public List<Category> getAllCategory() throws Exception {
         List<Category> categories = new LinkedList<>();
-        Document document = searchUtil.getDocument(getCategoryBaseUrl());
-        Elements rootCategoryElement = document.getElementsByClass("service-panel full");
-
-        final String keywords = "宠物";
-
-        for (int index = 0; index < rootCategoryElement.size(); index++) {
-
-            Element categoryDoc = rootCategoryElement.get(index);
-            String category1 = categoryDoc.select("h5").text();
-            if (StringUtil.isNotEmpty(category1) && category1.contains(keywords)) {
-                String category3 = StringUtil.EMPTY;
-
-                Elements secondDocs = categoryDoc.getElementsByClass("p a");
-                for (Element secondDoc : secondDocs) {
-                    String link = secondDoc.attr("href");
-                    String category2 = secondDoc.text();
-                    Category category = buildCategory(category1, category2, category3, link);
-                    categories.add(category);
-                }
-            }
+        String[] categoriesArr = {"宠物用品", "宠物生活", "宠物食品", "宠物"};
+        String catgory1 = "宠物";
+        for (String category2 : categoriesArr) {
+            String categoryLink = BASEPAGELINK + category2;
+            Category category = buildCategory(catgory1, category2, StringUtil.EMPTY, categoryLink);
+            categories.add(category);
         }
+
         return categories;
     }
 

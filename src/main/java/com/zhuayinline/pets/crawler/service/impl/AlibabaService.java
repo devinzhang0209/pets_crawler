@@ -17,6 +17,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -177,6 +178,10 @@ public class AlibabaService extends AbstractPetsCall {
                                 pageUrl = pageUrl.replaceAll("replaceSeq", seq + "");
                                 products.addAll(getProducts(category, pageUrl));
                                 Thread.sleep(10 * 1000);
+                            }
+                            if (page % 3 == 0) {
+                                saveProduct(petsProductMapper, products);
+                                products = new ArrayList();
                             }
                         }
                     }

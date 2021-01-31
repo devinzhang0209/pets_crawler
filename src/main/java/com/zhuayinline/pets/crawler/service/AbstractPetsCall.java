@@ -9,10 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author devin
@@ -81,6 +78,11 @@ public abstract class AbstractPetsCall {
                         for (int page = 2; page <= pageSize; page++) {
                             System.out.println("begin to search the " + page + " page");
                             products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
+                            //submit
+                            if (page % 3 == 0) {
+                                saveProduct(petsProductMapper, products);
+                                products = new ArrayList();
+                            }
                         }
                     }
                     saveProduct(petsProductMapper, products);
