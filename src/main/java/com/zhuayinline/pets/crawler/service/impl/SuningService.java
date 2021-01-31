@@ -126,7 +126,6 @@ public class SuningService extends AbstractPetsCall {
 
                 if (StringUtil.isNotEmpty(productLink)) {
                     Document productDocument = searchUtil.getDocument(productLink);
-                    Thread.sleep(5 * 1000);
                     if (productDocument == null) {
                         continue;
                     }
@@ -153,7 +152,6 @@ public class SuningService extends AbstractPetsCall {
                     }
 
                     String productPrice = ((JSONObject) jsonObj.get(0)).getString("price");
-                    Thread.sleep(5 * 1000);
                     if (StringUtil.isEmpty(productPrice)) {
                         productPrice = "0";
                     }
@@ -199,7 +197,6 @@ public class SuningService extends AbstractPetsCall {
 
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     products.add(product);
-                    Thread.sleep(5000);
                 }
             }
         }
