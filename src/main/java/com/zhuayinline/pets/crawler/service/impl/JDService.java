@@ -108,11 +108,13 @@ public class JDService extends AbstractPetsCall {
             for (Element element : productList) {
                 String productId = element.attr("data-sku");
                 String productLink = HTTPS + element.select("div[class='p-img'] a").attr("href");
-                String imageLink = element.select("div[class='p-img'] a img").attr("src");
+                String imageLink = HTTPS + element.select("div[class='p-img'] a img").attr("data-lazy-img");
                 String productPrice = StringUtil.EMPTY;
                 if (element.getElementsByClass("p-price") != null) {
-                    String price_n = element.getElementsByClass("price_n").text();
+                    String price_n = element.getElementsByClass("p-price").get(0).text();
                     productPrice = price_n.replaceAll("¥", "").replaceAll("￥", "");
+                    String[] s = productPrice.split(" ");
+                    productPrice = s[0];
                 }
                 if (StringUtil.isNotEmpty(productLink)) {
                     Document productDocument = searchUtil.getDocument(productLink);
@@ -124,6 +126,8 @@ public class JDService extends AbstractPetsCall {
                     String brand = StringUtil.EMPTY;
                     if (null != productDocument.getElementById("parameter-brand")) {
                         brand = productDocument.getElementById("parameter-brand").text();
+                        brand = brand.replaceAll("品牌：", "");
+                        brand = brand.trim();
                     }
                     String model = "毛重";
                     String model2 = "规格";
@@ -145,6 +149,11 @@ public class JDService extends AbstractPetsCall {
                                 }
                             }
                         }
+                    }
+                    if (StringUtil.isNotEmpty(productSpecs) && productSpecs.contains("：")) {
+                        String key = productSpecs.split("：")[0];
+                        productSpecs = productSpecs.replaceAll(key, "");
+                        productSpecs = productSpecs.replaceAll("：", "");
                     }
                     String productUnit = productSpecs;
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);

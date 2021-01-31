@@ -142,6 +142,7 @@ public abstract class AbstractPetsCall {
         product.setProductUnit(productUnit);
         product.setProductImageLink(imageLink);
         product.setProductLink(productLink);
+        System.out.println("productPrice:" + productPrice);
         product.setProductPrice(new BigDecimal(StringUtil.isEmpty(productPrice) ? "0" : productPrice));
         product.setProductSpecs(productSpecs);
         product.setCreatedTime(DateUtil.getNow());
