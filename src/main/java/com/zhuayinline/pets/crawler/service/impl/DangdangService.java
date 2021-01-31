@@ -1,11 +1,8 @@
 package com.zhuayinline.pets.crawler.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
-import com.zhuayinline.pets.crawler.util.HttpUtil;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
@@ -28,7 +25,7 @@ import java.util.Map;
  * @date 2021-1-29 17:56:36
  */
 @Service
-public class DangdangService extends IPetsCall {
+public class DangdangService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -167,19 +164,20 @@ public class DangdangService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
         String firstPageUrl = category.getCategoryLink();
         String pageLink = firstPageUrl.replaceAll("dangdang.com/", "dangdang.com/pg" + page + "-");
-        System.out.println(String.format("pageLink:%s",pageLink));
+        System.out.println(String.format("pageLink:%s", pageLink));
         return pageLink;
     }
 }

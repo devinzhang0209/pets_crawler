@@ -2,7 +2,7 @@ package com.zhuayinline.pets.crawler.service.impl;
 
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Devin Zhang
@@ -27,7 +25,7 @@ import java.util.regex.Pattern;
  * @date 2021-1-20 22:36:16
  */
 @Service
-public class MCTService extends IPetsCall {
+public class MCTService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -150,12 +148,13 @@ public class MCTService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override

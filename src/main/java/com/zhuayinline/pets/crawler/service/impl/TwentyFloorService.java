@@ -2,7 +2,7 @@ package com.zhuayinline.pets.crawler.service.impl;
 
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
@@ -25,7 +25,7 @@ import java.util.Map;
  * @date 2021-1-21 22:33:28
  */
 @Service
-public class TwentyFloorService extends IPetsCall {
+public class TwentyFloorService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -171,12 +171,13 @@ public class TwentyFloorService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override

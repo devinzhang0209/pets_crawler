@@ -4,37 +4,31 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.HttpUtil;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
 import com.zhuayinline.pets.crawler.vo.Website;
-import netscape.javascript.JSObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Devin Zhang
- * @className AlibabaService
+ * @className AbstractPetsCall
  * @description TODO
  * @date 2021-1-26 22:21:47
  */
 @Service
-public class AlibabaService extends IPetsCall {
+public class AlibabaService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -161,8 +155,11 @@ public class AlibabaService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
+            if (runing.get(getSource()) != null) {
+                return "上一次爬取还未运行结束";
+            }
             List<Category> allCategory = getAllCategory();
             if (CollectionUtils.isNotEmpty(allCategory)) {
                 for (Category category : allCategory) {
@@ -188,7 +185,10 @@ public class AlibabaService extends IPetsCall {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            runing.remove(getSource());
         }
+        return "爬取成功";
     }
 
     @Override

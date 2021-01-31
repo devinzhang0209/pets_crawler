@@ -9,7 +9,7 @@ public enum Website {
     MCT("萌宠堂", "https://www.mengchongtang.com/", "https://www.mengchongtang.com/catalog.php"),
     TWLCWYPSC("20楼宠物用品商城", "http://20floor.com/", "http://20floor.com/"),
     CWSC("宠物商城", "https://www.goodmaoning.com/", "https://www.goodmaoning.com/brand_index.html"),
-    TAOBAO("淘宝", "", ""),
+    TAOBAO("淘宝", "https://www.taobao.com/", "https://www.taobao.com/"),
     TMALL("天猫", "https://www.tmall.com/", "https://www.tmall.com/"),
     ALIBABA("阿里巴巴", "https://1688.com", "https://p4psearch.1688.com/p4p114/p4psearch/offer.htm?keywords=replacehere&cosite=&location=&trackid=&spm=a2609.11209760.j3f8podl.e5rt432e&keywordid="),
     JD("京东", "https://www.jd.com/", "https://www.jd.com/allSort.aspx"),

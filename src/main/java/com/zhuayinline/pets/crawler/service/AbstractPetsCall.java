@@ -19,12 +19,10 @@ import java.util.Map;
  * @date 2020-12-8 20:17:13
  * @description interface for crawler
  */
-public abstract class IPetsCall {
+public abstract class AbstractPetsCall {
 
     public static final String HTTPS = "https:";
-
-    private String source;
-    private String categoryBaseUrl;
+    public static Map<String, String> runing = new HashMap();
 
     /**
      * get all category
@@ -44,15 +42,18 @@ public abstract class IPetsCall {
     public abstract List<PetsProduct> getProducts(Category category, String categoryProductUrl) throws Exception;
 
 
-    public abstract void search() throws Exception;
+    public abstract String search() throws Exception;
 
     /**
      * get the product list
      *
      * @throws Exception
      */
-    public void search(PetsProductMapper petsProductMapper) throws Exception {
+    public String search(PetsProductMapper petsProductMapper) throws Exception {
         try {
+            if (runing.get(getSource()) != null) {
+                return "上一次爬取还未运行结束";
+            }
             List<Category> allCategory = getAllCategory();
             if (CollectionUtils.isNotEmpty(allCategory)) {
                 for (Category category : allCategory) {
@@ -87,7 +88,11 @@ public abstract class IPetsCall {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return "爬取失败";
+        } finally {
+            runing.remove(getSource());
         }
+        return "爬取成功";
     }
 
     public abstract String getPageLink(int page, Category category, Map<String, String> otherParams);

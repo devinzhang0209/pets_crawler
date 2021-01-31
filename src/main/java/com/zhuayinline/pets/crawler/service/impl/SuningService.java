@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.HttpUtil;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
@@ -28,7 +28,7 @@ import java.util.Map;
  * @date 2021-1-24 11:44:32
  */
 @Service
-public class SuningService extends IPetsCall {
+public class SuningService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -207,12 +207,13 @@ public class SuningService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override

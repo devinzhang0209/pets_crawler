@@ -1,12 +1,11 @@
 package com.zhuayinline.pets.crawler.controller;
 
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.service.impl.*;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Result;
 import com.zhuayinline.pets.crawler.vo.Website;
 import io.swagger.annotations.Api;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,13 +36,19 @@ public class PetsProductController {
     @Resource
     private SuningService suningService;
     @Resource
-    private AlibabaService alibabaService;
+    private AbstractPetsCall alibabaService;
     @Resource
     private DangdangService dangdangService;
+    @Resource
+    private JDService jdService;
+    @Resource
+    private TaobaoService taobaoService;
+    @Resource
+    private TmallService tmallService;
 
     @GetMapping("/begin")
     public String callBoQi(String action) throws Exception {
-        IPetsCall service = null;
+        AbstractPetsCall service = null;
         if (StringUtil.isEmpty(action)) {
             return Result.failResult("action can't be null");
         }
@@ -64,12 +69,18 @@ public class PetsProductController {
             service = alibabaService;
         } else if (action.equalsIgnoreCase(Website.DANGDANG.name())) {
             service = dangdangService;
+        } else if (action.equalsIgnoreCase(Website.JD.name())) {
+            service = jdService;
+        } else if (action.equalsIgnoreCase(Website.TMALL.name())) {
+            service = tmallService;
+        } else if (action.equalsIgnoreCase(Website.TAOBAO.name())) {
+            service = taobaoService;
         }
         if (null == service) {
             return Result.failResult("action not found");
         }
-        service.search();
-        return Result.succResult(null);
+        String result = service.search();
+        return Result.succResult(result);
     }
 
 

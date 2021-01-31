@@ -2,7 +2,7 @@ package com.zhuayinline.pets.crawler.service.impl;
 
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class EPetsService extends IPetsCall {
+public class EPetsService extends AbstractPetsCall {
     @Autowired
     private SearchUtil searchUtil;
     @Autowired
@@ -174,12 +174,13 @@ public class EPetsService extends IPetsCall {
     }
 
     @Override
-    public void search() throws Exception {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override

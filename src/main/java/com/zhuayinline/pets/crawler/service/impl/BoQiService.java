@@ -2,26 +2,20 @@ package com.zhuayinline.pets.crawler.service.impl;
 
 import com.zhuayinline.pets.crawler.dao.PetsProductMapper;
 import com.zhuayinline.pets.crawler.entity.PetsProduct;
-import com.zhuayinline.pets.crawler.service.IPetsCall;
-import com.zhuayinline.pets.crawler.util.DateUtil;
+import com.zhuayinline.pets.crawler.service.AbstractPetsCall;
 import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
 import com.zhuayinline.pets.crawler.vo.Website;
-import org.apache.commons.collections.CollectionUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
 
-import java.math.BigDecimal;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +26,7 @@ import java.util.regex.Pattern;
  * @date 2020-12-9 09:13:03
  */
 @Service
-public class BoQiService extends IPetsCall {
+public class BoQiService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -151,12 +145,13 @@ public class BoQiService extends IPetsCall {
     }
 
     @Override
-    public void search() {
+    public String search() {
         try {
-            super.search(petsProductMapper);
+            return super.search(petsProductMapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return StringUtil.EMPTY;
     }
 
     @Override

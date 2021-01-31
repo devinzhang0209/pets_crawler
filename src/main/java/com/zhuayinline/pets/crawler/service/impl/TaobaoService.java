@@ -20,12 +20,12 @@ import java.util.Map;
 
 /**
  * @author Devin Zhang
- * @className Tmall servvice
+ * @className Taobao servvice
  * @description TODO
- * @date 2021-1-30 09:09:23
+ * @date 2021-1-30 13:08:01
  */
 @Service
-public class TmallService extends AbstractPetsCall {
+public class TaobaoService extends AbstractPetsCall {
 
     @Autowired
     private SearchUtil searchUtil;
@@ -36,30 +36,36 @@ public class TmallService extends AbstractPetsCall {
 
     @Override
     public String getSource() {
-        return Website.TMALL.getWebsiteName();
+        return Website.TAOBAO.getWebsiteName();
     }
 
     @Override
     public String getCategoryBaseUrl() {
-        return Website.TMALL.getBaseCategoryUrl();
+        return Website.TAOBAO.getBaseCategoryUrl();
     }
 
     @Override
     public List<Category> getAllCategory() throws Exception {
         List<Category> categories = new LinkedList<>();
         Document document = searchUtil.getDocument(getCategoryBaseUrl());
-        Elements rootCategoryElement = document.getElementsByClass("j_MenuNav nav-item a");
+        Elements rootCategoryElement = document.getElementsByClass("service-panel full");
+
+        final String keywords = "宠物";
 
         for (int index = 0; index < rootCategoryElement.size(); index++) {
 
             Element categoryDoc = rootCategoryElement.get(index);
-            String category1 = "宠物";
-            String category2 = categoryDoc.text();
-            if (StringUtil.isNotEmpty(category2) && category2.contains(category1)) {
-                String category3 = "宠物食品及用品";
-                String categoryLink = categoryDoc.attr("href");
-                Category category = buildCategory(category1, category2, category3, categoryLink);
-                categories.add(category);
+            String category1 = categoryDoc.select("h5").text();
+            if (StringUtil.isNotEmpty(category1) && category1.contains(keywords)) {
+                String category3 = StringUtil.EMPTY;
+
+                Elements secondDocs = categoryDoc.getElementsByClass("p a");
+                for (Element secondDoc : secondDocs) {
+                    String link = secondDoc.attr("href");
+                    String category2 = secondDoc.text();
+                    Category category = buildCategory(category1, category2, category3, link);
+                    categories.add(category);
+                }
             }
         }
         return categories;
@@ -71,8 +77,12 @@ public class TmallService extends AbstractPetsCall {
         Integer page = 1;
         Document document = searchUtil.getDocument(categoryProductUrl);
         try {
-            String totalPage = document.getElementsByClass("ui-page-s-len").text();
-            totalPage = totalPage.replaceAll("1/", "").trim();
+            String totalPage = document.getElementsByClass("total").text();
+            totalPage = totalPage.replaceAll("共", "")
+                    .replaceAll("页", "")
+                    .replaceAll("，", "")
+                    .replaceAll(",", "")
+                    .trim();
             page = Integer.parseInt(totalPage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,19 +96,17 @@ public class TmallService extends AbstractPetsCall {
         List<PetsProduct> products = new LinkedList<>();
 
         Document document = searchUtil.getDocument(categoryProductUrl);
-        if (CollectionUtils.isNotEmpty(document.getElementsByClass("view grid-nosku"))
-                && CollectionUtils.isNotEmpty(document.getElementsByClass("view grid-nosku").get(0).children())) {
-            Elements productList = document.getElementsByClass("view grid-nosku").get(0).children();
+        if (CollectionUtils.isNotEmpty(document.getElementsByClass("item J_MouserOnverReq"))) {
+            Elements productList = document.getElementsByClass("view grid-nosku");
             for (Element element : productList) {
                 String productId = element.attr("data-id");
-                String productLink = HTTPS + element.select("div[class='productImg-wrap'] a").attr("href");
-                String imageLink = HTTPS + element.select("div[class='productImg-wrap'] a img").attr("src");
-                String productName = element.getElementsByClass("productTitle").text();
-                String companyName = element.getElementsByClass("productShop").text();
+                String productLink = HTTPS + element.select("div[class='pic'] a").attr("href");
+                String imageLink = HTTPS + element.select("div[class='pic'] a img").attr("src");
+                String companyName = element.getElementsByClass("shopname").text();
 
                 String productPrice = StringUtil.EMPTY;
-                if (element.getElementsByClass("productPrice") != null) {
-                    String price_n = element.getElementsByClass("productPrice").text();
+                if (element.getElementsByClass("price g_price g_price-highlight") != null) {
+                    String price_n = element.getElementsByClass("price g_price g_price-highlight").text();
                     productPrice = price_n.replaceAll("¥", "").replaceAll("￥", "");
                 }
                 if (StringUtil.isNotEmpty(productLink)) {
@@ -106,50 +114,61 @@ public class TmallService extends AbstractPetsCall {
                     if (productDocument == null) {
                         continue;
                     }
+                    String productName = productDocument.getElementsByClass("tb-detail-hd").text();
 
                     String brand = StringUtil.EMPTY;
-                    if (null != productDocument.getElementById("parameter-brand")) {
-                        brand = productDocument.getElementById("parameter-brand").text();
+                    if (null != productDocument.getElementById("J_BrandAttr")
+                            && null != productDocument.getElementById("J_BrandAttr").select("b")) {
+                        brand = productDocument.getElementById("J_BrandAttr").select("b").text();
                     }
 
                     String productSpecs = StringUtil.EMPTY;
+                    if (StringUtil.isEmpty(productSpecs) && CollectionUtils.isNotEmpty(productDocument.getElementsByClass("tb-selected"))) {
+                        productSpecs = productDocument.getElementsByClass("tb-selected").text();
+                    }
                     if (CollectionUtils.isNotEmpty(productDocument.getElementsByClass("tm-item-weight"))
                             && CollectionUtils.isNotEmpty(productDocument.getElementsByClass("tm-item-weight").get(0).select("dd em"))
                     ) {
                         productSpecs = productDocument.getElementsByClass("tm-item-weight").get(0).select("dd em").text();
                     }
-                    if (StringUtil.isEmpty(productSpecs) && CollectionUtils.isNotEmpty(productDocument.getElementsByClass("tb-selected"))) {
-                        productSpecs = productDocument.getElementsByClass("tb-selected").text();
-                    }
+
 
                     String brandKeyword = "品牌";
                     String model = "毛重";
                     String model2 = "规格";
                     String model3 = "适用";
+                    String model4 = "分类";
+                    String model5 = "含量";
+                    String model6 = "重量";
 
                     if (productDocument.getElementById("J_AttrUL") != null) {
                         Elements fontDoc = productDocument.getElementById("J_AttrUL").children();
                         for (int i = 0; i < fontDoc.size(); i++) {
                             String text = fontDoc.get(i).text();
-                            String value = fontDoc.get(i).attr("title");
-
-                            if (StringUtil.isEmpty(text)) {
+                            if (null == text) {
                                 continue;
                             }
+                            String value = fontDoc.get(i).attr("title");
+
                             if (StringUtil.isEmpty(productSpecs) &&
-                                    (text.contains(model) || text.contains(model2) || text.contains(model3))) {
+                                    (text.contains(model)
+                                            || text.contains(model2)
+                                            || text.contains(model3)
+                                            || text.contains(model4)
+                                            || text.contains(model5)
+                                            || text.contains(model6))
+                            ) {
                                 productSpecs = value;
                             }
-                            if (text.contains(brandKeyword)) {
+                            if (StringUtil.isEmpty(brand) && text.contains(brandKeyword)) {
                                 brand = value;
                             }
                         }
-
                     }
+                    String productUnit = productSpecs;
                     if (StringUtil.isEmpty(brand)) {
                         brand = companyName;
                     }
-                    String productUnit = productSpecs;
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     products.add(product);
                 }
@@ -170,18 +189,11 @@ public class TmallService extends AbstractPetsCall {
 
     @Override
     public String getPageLink(int page, Category category, Map<String, String> otherParams) {
-        final int len = 60;
-        String firstPageUrl = category.getCategoryLink();
-        int s = page * len;
-
-        Document document = searchUtil.getDocument(firstPageUrl);
-        Elements elementsByClass = document.getElementsByClass("ui-page-s-next");
-        if (null != elementsByClass && CollectionUtils.isNotEmpty(elementsByClass)) {
-            String href = elementsByClass.get(0).attr("href");
-            String pageLink = BASEPAGELINK + href;
-            System.out.println(String.format("pageLink:%s", pageLink));
-            return pageLink.replaceAll("&s=60", "&s=" + s);
-        }
-        return null;
+        final int len = 44;
+        int s = (page - 1) * len;
+        String pageLink = category.getCategoryLink();
+        pageLink = pageLink + "&bcoffset=1&ntoffset=1&p4ppushleft=2%2C48&s=" + s;
+        System.out.println(String.format("pageLink:%s", pageLink));
+        return pageLink;
     }
 }
