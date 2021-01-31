@@ -156,7 +156,6 @@ public class DangdangService extends AbstractPetsCall {
 
                     PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     products.add(product);
-                    Thread.sleep(5000);
                 }
             }
         }
