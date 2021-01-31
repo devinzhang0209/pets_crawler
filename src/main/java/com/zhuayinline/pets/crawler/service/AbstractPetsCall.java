@@ -54,6 +54,7 @@ public abstract class AbstractPetsCall {
             if (runing.get(getSource()) != null) {
                 return "上一次爬取还未运行结束";
             }
+            runing.put(getSource(), getSource());
             List<Category> allCategory = getAllCategory();
             if (CollectionUtils.isNotEmpty(allCategory)) {
                 for (Category category : allCategory) {
