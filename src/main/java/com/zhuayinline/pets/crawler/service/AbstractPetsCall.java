@@ -5,6 +5,7 @@ import com.zhuayinline.pets.crawler.entity.PetsProduct;
 import com.zhuayinline.pets.crawler.util.DateUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
+import com.zhuayinline.pets.crawler.vo.Website;
 import org.apache.commons.collections.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 
@@ -48,10 +49,10 @@ public abstract class AbstractPetsCall {
      */
     public String search(PetsProductMapper petsProductMapper) throws Exception {
         try {
-            if (runing.get(getSource()) != null) {
+            if (runing.get(getCategoryBaseUrl()) != null) {
                 return "上一次爬取还未运行结束";
             }
-            runing.put(getSource(), getSource());
+            runing.put(getCategoryBaseUrl(), getCategoryBaseUrl());
             List<Category> allCategory = getAllCategory();
             if (CollectionUtils.isNotEmpty(allCategory)) {
                 for (Category category : allCategory) {
@@ -66,7 +67,14 @@ public abstract class AbstractPetsCall {
                     System.out.println("total page:" + pageSize);
                     System.out.println("begin to search the first page...");
                     //第一页
-                    products.addAll(getProducts(category, category.getCategoryLink()));
+                    try {
+                        products.addAll(getProducts(category, category.getCategoryLink()));
+                        if (getSource().equals(Website.TMALLANDTAOBAO.getWebsiteName())) {
+                            Thread.sleep(25 * 1000);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     if (pageSize > 1) {
                         //for 20floor
@@ -76,8 +84,15 @@ public abstract class AbstractPetsCall {
                         }
 
                         for (int page = 2; page <= pageSize; page++) {
-                            System.out.println("begin to search the " + page + " page");
-                            products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
+                            try {
+                                System.out.println("begin to search the " + page + " page");
+                                products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
+                                if (getSource().equals(Website.TMALLANDTAOBAO.getWebsiteName())) {
+                                    Thread.sleep(25 * 1000);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             //submit
                             if (page % 3 == 0) {
                                 saveProduct(petsProductMapper, products);
@@ -88,12 +103,11 @@ public abstract class AbstractPetsCall {
                     saveProduct(petsProductMapper, products);
                 }
             }
-
+            runing.remove(getCategoryBaseUrl());
         } catch (Exception e) {
             e.printStackTrace();
+            runing.remove(getCategoryBaseUrl());
             return "爬取失败";
-        } finally {
-            runing.remove(getSource());
         }
         return "爬取成功";
     }
@@ -133,8 +147,12 @@ public abstract class AbstractPetsCall {
     }
 
     public PetsProduct buildProduct(String productId, Category category, String productName, String brand, String productUnit, String imageLink, String productLink, String productPrice, String productSpecs) {
+        return buildProduct(getSource(), productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+    }
+
+    public PetsProduct buildProduct(String source, String productId, Category category, String productName, String brand, String productUnit, String imageLink, String productLink, String productPrice, String productSpecs) {
         PetsProduct product = new PetsProduct();
-        product.setSource(getSource());
+        product.setSource(source);
         product.setProductId(productId);
         product.setCategory1(category.getCategory1());
         product.setCategory2(category.getCategory2());
@@ -152,6 +170,7 @@ public abstract class AbstractPetsCall {
         System.out.println(product);
         return product;
     }
+
 
 }
 

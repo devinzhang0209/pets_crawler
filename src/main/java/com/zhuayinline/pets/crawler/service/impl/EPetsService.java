@@ -7,6 +7,7 @@ import com.zhuayinline.pets.crawler.util.SearchUtil;
 import com.zhuayinline.pets.crawler.util.StringUtil;
 import com.zhuayinline.pets.crawler.vo.Category;
 import com.zhuayinline.pets.crawler.vo.Website;
+import org.apache.commons.collections.CollectionUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -106,68 +107,77 @@ public class EPetsService extends AbstractPetsCall {
 
         Document document = searchUtil.getDocument(categoryProductUrl);
         Elements productList = document.getElementsByClass("list_box-li");
-        for (int i = 0; i < productList.size(); i++) {
-            String productLink = productList.get(i).getElementsByClass("gd-photo db rela").attr("href");
-            if (StringUtil.isNotEmpty(productLink)) {
-                Document productDocument = searchUtil.getDocument(productLink);
-                if (productDocument == null) {
-                    continue;
-                }
-                String productName = StringUtil.EMPTY;
-                if (productDocument.select("meta[property='og:title']").size() > 0) {
-                    productName = productDocument.select("meta[property='og:title']").get(0).attr("content");
-                }
-                if (StringUtil.isEmpty(productName)) {
-                    if (productDocument.getElementsByClass("gdtitle").size() > 0) {
-                        productName = productDocument.getElementsByClass("gdtitle").get(0).text();
-                    }
-                }
+        if (CollectionUtils.isNotEmpty(productList)) {
+            for (int i = 0; i < productList.size(); i++) {
+                PetsProduct product = null;
+                try {
+                    String productLink = productList.get(i).getElementsByClass("gd-photo db rela").attr("href");
+                    if (StringUtil.isNotEmpty(productLink)) {
 
-                String productPrice = StringUtil.EMPTY;
-                if (productDocument.select("meta[property='og:product:price']").size() > 0) {
-                    productPrice = productDocument.select("meta[property='og:product:price']").get(0).attr("content");
-                }
-                if (StringUtil.isEmpty(productPrice)) {
-                    productPrice = productDocument.getElementById("goods-sale-price").text();
-                }
-                String productSpecs = StringUtil.EMPTY;
-                try {
-                    productSpecs = productDocument.getElementsByClass("goods-select").parents().get(0).text();
-                } catch (Exception e) {
-                }
-                String productUnit = StringUtil.EMPTY;
-                if (StringUtil.isNotEmpty(productSpecs)) {
-                    productUnit = productSpecs;
-                }
-                String productImage = StringUtil.EMPTY;
-                String brand = StringUtil.EMPTY;
-                try {
-                    if (productDocument.getElementById("zoom1") != null) {
-                        productImage = productDocument.getElementById("zoom1").attr("href");
-                    }
-                    if (StringUtil.isEmpty(productImage)) {
-                        if (productList.get(i).getElementsByClass("gd-photoimg").size() > 0) {
-                            productImage = productList.get(i).getElementsByClass("gd-photoimg").get(0).attr("src0");
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null) {
+                            continue;
                         }
-                    }
-                    if (StringUtil.isEmpty(productImage)) {
-                        System.out.println();
-                    }
-                    brand = productDocument.getElementsByClass("fontline fl").get(0).text();
-                    brand = brand.replaceAll("品牌馆", "");
-                } catch (Exception e) {
-                }
-                String productId = "";
-                String patternStr = "/[0-9]*.html";
-                Pattern pattern = Pattern.compile(patternStr);
-                Matcher matcher = pattern.matcher(productLink);
-                if (matcher.find()) {
-                    productId = matcher.group();
-                    productId = productId.replaceAll(".html", "").replaceAll("/", "");
-                }
-                PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, productImage, productLink, productPrice, productSpecs);
-                products.add(product);
+                        String productName = StringUtil.EMPTY;
+                        if (productDocument.select("meta[property='og:title']").size() > 0) {
+                            productName = productDocument.select("meta[property='og:title']").get(0).attr("content");
+                        }
+                        if (StringUtil.isEmpty(productName)) {
+                            if (productDocument.getElementsByClass("gdtitle").size() > 0) {
+                                productName = productDocument.getElementsByClass("gdtitle").get(0).text();
+                            }
+                        }
 
+                        String productPrice = StringUtil.EMPTY;
+                        if (productDocument.select("meta[property='og:product:price']").size() > 0) {
+                            productPrice = productDocument.select("meta[property='og:product:price']").get(0).attr("content");
+                        }
+                        if (StringUtil.isEmpty(productPrice)) {
+                            productPrice = productDocument.getElementById("goods-sale-price").text();
+                        }
+                        String productSpecs = StringUtil.EMPTY;
+                        try {
+                            productSpecs = productDocument.getElementsByClass("goods-select").parents().get(0).text();
+                        } catch (Exception e) {
+                        }
+                        String productUnit = StringUtil.EMPTY;
+                        if (StringUtil.isNotEmpty(productSpecs)) {
+                            productUnit = productSpecs;
+                        }
+                        String productImage = StringUtil.EMPTY;
+                        String brand = StringUtil.EMPTY;
+                        try {
+                            if (productDocument.getElementById("zoom1") != null) {
+                                productImage = productDocument.getElementById("zoom1").attr("href");
+                            }
+                            if (StringUtil.isEmpty(productImage)) {
+                                if (productList.get(i).getElementsByClass("gd-photoimg").size() > 0) {
+                                    productImage = productList.get(i).getElementsByClass("gd-photoimg").get(0).attr("src0");
+                                }
+                            }
+                            if (StringUtil.isEmpty(productImage)) {
+                                System.out.println();
+                            }
+                            brand = productDocument.getElementsByClass("fontline fl").get(0).text();
+                            brand = brand.replaceAll("品牌馆", "");
+                        } catch (Exception e) {
+                        }
+                        String productId = "";
+                        String patternStr = "/[0-9]*.html";
+                        Pattern pattern = Pattern.compile(patternStr);
+                        Matcher matcher = pattern.matcher(productLink);
+                        if (matcher.find()) {
+                            productId = matcher.group();
+                            productId = productId.replaceAll(".html", "").replaceAll("/", "");
+                        }
+                        product = buildProduct(productId, category, productName, brand, productUnit, productImage, productLink, productPrice, productSpecs);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
+                    products.add(product);
+                }
             }
         }
         return products;

@@ -108,53 +108,60 @@ public class DangdangService extends AbstractPetsCall {
         if (CollectionUtils.isNotEmpty(document.getElementsByClass("bigimg cloth_shoplist"))
                 && CollectionUtils.isNotEmpty(document.getElementsByClass("bigimg cloth_shoplist").get(0).children())) {
             Elements productList = document.getElementsByClass("bigimg cloth_shoplist").get(0).children();
+            PetsProduct product = null;
             for (Element element : productList) {
-                String productId = element.attr("id");
-                String productLink = element.select("a").attr("href");
-                String imageLink = element.select("a img").attr("data-original");
-                String productName = element.select("a").attr("title");
+                try {
+                    String productId = element.attr("id");
+                    String productLink = element.select("a").attr("href");
+                    String imageLink = element.select("a img").attr("data-original");
+                    String productName = element.select("a").attr("title");
 
-                if (StringUtil.isNotEmpty(productLink)) {
-                    Document productDocument = searchUtil.getDocument(productLink);
-                    if (productDocument == null) {
-                        continue;
-                    }
-                    String productPrice = StringUtil.EMPTY;
-                    if (element.getElementsByClass("price_n") != null) {
-                        String price_n = element.getElementsByClass("price_n").text();
-                        productPrice = price_n.replaceAll("¥", "");
-                    }
-                    String brand = StringUtil.EMPTY;
-                    String brands = "品牌";
-                    String model = "适用";
-                    String model2 = "种类";
+                    if (StringUtil.isNotEmpty(productLink)) {
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null) {
+                            continue;
+                        }
+                        String productPrice = StringUtil.EMPTY;
+                        if (element.getElementsByClass("price_n") != null) {
+                            String price_n = element.getElementsByClass("price_n").text();
+                            productPrice = price_n.replaceAll("¥", "");
+                        }
+                        String brand = StringUtil.EMPTY;
+                        String brands = "品牌";
+                        String model = "适用";
+                        String model2 = "种类";
 
-                    String productSpecs = StringUtil.EMPTY;
-                    if (productDocument.getElementsByClass("pro_content") != null) {
-                        Elements fontDoc = productDocument.select("ul[class=key clearfix] li");
-                        for (int i = 0; i < fontDoc.size(); i++) {
-                            String text = fontDoc.get(i).text();
-                            if (StringUtil.isEmpty(text)) {
-                                continue;
+                        String productSpecs = StringUtil.EMPTY;
+                        if (productDocument.getElementsByClass("pro_content") != null) {
+                            Elements fontDoc = productDocument.select("ul[class=key clearfix] li");
+                            for (int i = 0; i < fontDoc.size(); i++) {
+                                String text = fontDoc.get(i).text();
+                                if (StringUtil.isEmpty(text)) {
+                                    continue;
+                                }
+                                String value = StringUtil.EMPTY;
+                                Elements valueElement = fontDoc.get(i).select("a");
+                                if (CollectionUtils.isNotEmpty(valueElement)) {
+                                    value = valueElement.text();
+                                }
+                                if (text.contains(brands)) {
+                                    brand = value;
+                                }
+                                if (text.contains(model) || text.contains(model2)) {
+                                    productSpecs = value;
+                                }
                             }
-                            String value = StringUtil.EMPTY;
-                            Elements valueElement = fontDoc.get(i).select("a");
-                            if (CollectionUtils.isNotEmpty(valueElement)) {
-                                value = valueElement.text();
-                            }
-                            if (text.contains(brands)) {
-                                brand = value;
-                            }
-                            if (text.contains(model) || text.contains(model2)) {
-                                productSpecs = value;
-                            }
+
                         }
 
+                        String productUnit = productSpecs;
+
+                        product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     }
-
-                    String productUnit = productSpecs;
-
-                    PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
                     products.add(product);
                 }
             }

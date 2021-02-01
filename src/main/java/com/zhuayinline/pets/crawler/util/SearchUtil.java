@@ -27,7 +27,18 @@ public class SearchUtil {
             "Mozilla/5.0 (Windows NT 6.1; W…) Gecko/20100101 Firefox/60.0"};
 
     public Document getDocument(String url) {
-        Document document = buildDocument(url);
+        return getDocument(url, 0);
+    }
+
+
+    public Document getDocument(String url, int op) {
+        Document document;
+
+        if (op == 1) {
+            document = buildDocumentByHttpClient(url);
+        } else {
+            document = buildDocument(url);
+        }
         while (document == null) {
             try {
                 Thread.sleep(3 * 60 * 1000);
@@ -43,6 +54,7 @@ public class SearchUtil {
         }
         return document;
     }
+
 
     private Document buildDocument(String url) {
         Random r = new Random();

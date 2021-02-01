@@ -110,36 +110,41 @@ public class MCTService extends AbstractPetsCall {
         if (CollectionUtils.isNotEmpty(document.getElementsByClass("list-all"))) {
             Elements productList = document.getElementsByClass("list-all").get(0).children();
             for (Element element : productList) {
-                String productLink = element.getElementsByClass("pic fly_img").get(0).select("a").attr("href");
-                String imageLink = element.getElementsByClass("pic fly_img").get(0).select("img").attr("src");
-                if (StringUtil.isNotEmpty(productLink)) {
-                    Document productDocument = searchUtil.getDocument(productLink);
-                    if (productDocument == null || productDocument.getElementById("base_name-sf") == null) {
-                        continue;
-                    }
-                    String productName = productDocument.getElementById("base_name-sf").text();
-                    String productPrice = productDocument.getElementById("ECS_SHOPPRICE").text().replaceAll("￥", "").trim();
-                    String brand = StringUtil.EMPTY;
-                    String productSpecs = StringUtil.EMPTY;
-                    if (productDocument.getElementById("J_des") != null) {
-                        Elements liElements = productDocument.getElementById("J_des").select("li");
-                        if (CollectionUtils.isNotEmpty(liElements)) {
-                            brand = productDocument.getElementById("J_des").select("li").get(0).select("a").text();
-                            if (liElements.size() >= 4) {
-                                productSpecs = productDocument.getElementById("J_des").select("li").get(3).text().replaceAll("重量：", "");
+                PetsProduct product = null;
+                try {
+                    String productLink = element.getElementsByClass("pic fly_img").get(0).select("a").attr("href");
+                    String imageLink = element.getElementsByClass("pic fly_img").get(0).select("img").attr("src");
+                    if (StringUtil.isNotEmpty(productLink)) {
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null || productDocument.getElementById("base_name-sf") == null) {
+                            continue;
+                        }
+                        String productName = productDocument.getElementById("base_name-sf").text();
+                        String productPrice = productDocument.getElementById("ECS_SHOPPRICE").text().replaceAll("￥", "").trim();
+                        String brand = StringUtil.EMPTY;
+                        String productSpecs = StringUtil.EMPTY;
+                        if (productDocument.getElementById("J_des") != null) {
+                            Elements liElements = productDocument.getElementById("J_des").select("li");
+                            if (CollectionUtils.isNotEmpty(liElements)) {
+                                brand = productDocument.getElementById("J_des").select("li").get(0).select("a").text();
+                                if (liElements.size() >= 4) {
+                                    productSpecs = productDocument.getElementById("J_des").select("li").get(3).text().replaceAll("重量：", "");
+                                }
                             }
                         }
+
+                        String productUnit = StringUtil.EMPTY;
+                        if (StringUtil.isNotEmpty(productSpecs)) {
+                            productUnit = productSpecs;
+                        }
+
+                        String productId = element.attr("id").replaceAll("goods_id_", "");
+                        product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     }
-
-                    String productUnit = StringUtil.EMPTY;
-                    if (StringUtil.isNotEmpty(productSpecs)) {
-                        productUnit = productSpecs;
-                    }
-
-                    String productId = element.attr("id").replaceAll("goods_id_", "");
-
-
-                    PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
                     products.add(product);
                 }
             }

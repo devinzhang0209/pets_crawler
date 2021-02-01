@@ -116,59 +116,66 @@ public class GoodmaoningService extends AbstractPetsCall {
         Elements productList = document.getElementsByClass("thumb");
         if (CollectionUtils.isNotEmpty(productList)) {
             for (Element element : productList) {
-                String productLink = Website.CWSC.getWebsiteUrl() + element.select("a").attr("href");
-                String imageLink = element.select("a img").attr("src");
-                String productName = element.select("a img").attr("alt");
-                String productId = productLink.replaceAll(Website.CWSC.getWebsiteUrl(), "")
-                        .replaceAll(".html", "");
-                String brand = StringUtil.EMPTY;
-                if (element.parent() != null && CollectionUtils.isNotEmpty(element.parent().getElementsByClass("lj_qq"))) {
-                    brand = element.parent().getElementsByClass("lj_qq").text();
-                    brand = brand.replaceAll("\\.", "")
-                            .replaceAll(":", "")
-                            .replaceAll("旗舰店", "")
-                            .replaceAll(" ", "")
-                            .trim();
-                }
-                if (StringUtil.isNotEmpty(productLink)) {
-                    Document productDocument = searchUtil.getDocument(productLink);
-                    if (productDocument == null) {
-                        continue;
+                PetsProduct product = null;
+                try {
+                    String productLink = Website.CWSC.getWebsiteUrl() + element.select("a").attr("href");
+                    String imageLink = element.select("a img").attr("src");
+                    String productName = element.select("a img").attr("alt");
+                    String productId = productLink.replaceAll(Website.CWSC.getWebsiteUrl(), "")
+                            .replaceAll(".html", "");
+                    String brand = StringUtil.EMPTY;
+                    if (element.parent() != null && CollectionUtils.isNotEmpty(element.parent().getElementsByClass("lj_qq"))) {
+                        brand = element.parent().getElementsByClass("lj_qq").text();
+                        brand = brand.replaceAll("\\.", "")
+                                .replaceAll(":", "")
+                                .replaceAll("旗舰店", "")
+                                .replaceAll(" ", "")
+                                .trim();
                     }
-                    String productPrice;
-                    String priceSource = productDocument.getElementById("sku_price").text().replaceAll("￥", "").trim();
-                    if (priceSource.contains("~")) {
-                        productPrice = priceSource.split("~")[0];
-                    } else {
-                        productPrice = priceSource;
-                    }
-                    String productSpecs = StringUtil.EMPTY;
-                    Elements goodsSku = productDocument.getElementsByClass("goods_sku f_v tb-selected");
-                    if (CollectionUtils.isNotEmpty(goodsSku)) {
-                        try {
-                            productSpecs = goodsSku.text();
-                        } catch (Exception e) {
-
+                    if (StringUtil.isNotEmpty(productLink)) {
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null) {
+                            continue;
                         }
-                    }
+                        String productPrice;
+                        String priceSource = productDocument.getElementById("sku_price").text().replaceAll("￥", "").trim();
+                        if (priceSource.contains("~")) {
+                            productPrice = priceSource.split("~")[0];
+                        } else {
+                            productPrice = priceSource;
+                        }
+                        String productSpecs = StringUtil.EMPTY;
+                        Elements goodsSku = productDocument.getElementsByClass("goods_sku f_v tb-selected");
+                        if (CollectionUtils.isNotEmpty(goodsSku)) {
+                            try {
+                                productSpecs = goodsSku.text();
+                            } catch (Exception e) {
 
-                    //从产品名称中取产品规格
-                    String finder = StringUtil.EMPTY;
-                    String units = "kg|KG|g|千克|克|磅|G|cm|CM|w|W|ml|包";
-                    String patternStr = "(\\d*\\.)?[0-9]+(" + units + ")";
-                    Pattern pattern = Pattern.compile(patternStr);
-                    Matcher matcher = pattern.matcher(productName);
-                    if (matcher.find()) {
-                        finder = matcher.group();
-                    }
+                            }
+                        }
 
-                    if (StringUtil.isEmpty(productSpecs)
-                            || StringUtil.isNotEmpty(finder)
-                            || productSpecs.trim().equalsIgnoreCase("w")) {
-                        productSpecs = finder;
+                        //从产品名称中取产品规格
+                        String finder = StringUtil.EMPTY;
+                        String units = "kg|KG|g|千克|克|磅|G|cm|CM|w|W|ml|包";
+                        String patternStr = "(\\d*\\.)?[0-9]+(" + units + ")";
+                        Pattern pattern = Pattern.compile(patternStr);
+                        Matcher matcher = pattern.matcher(productName);
+                        if (matcher.find()) {
+                            finder = matcher.group();
+                        }
+
+                        if (StringUtil.isEmpty(productSpecs)
+                                || StringUtil.isNotEmpty(finder)
+                                || productSpecs.trim().equalsIgnoreCase("w")) {
+                            productSpecs = finder;
+                        }
+                        String productUnit = productSpecs;
+                        product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
                     }
-                    String productUnit = productSpecs;
-                    PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
                     products.add(product);
                 }
             }

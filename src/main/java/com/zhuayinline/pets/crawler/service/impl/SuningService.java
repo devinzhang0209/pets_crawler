@@ -118,84 +118,91 @@ public class SuningService extends AbstractPetsCall {
         if (CollectionUtils.isNotEmpty(document.getElementsByClass("product-list"))) {
             Elements productList = document.getElementsByClass("item-wrap");
             for (Element element : productList) {
-                String productId = element.attr("id");
-                Element element1 = element.getElementsByClass("img-block").get(0);
-                String productLink = HTTPS + element1.select("a").attr("href");
-                String imageLink = HTTPS + element1.select("a img").attr("src");
-                String productName = element1.select("a img").attr("alt");
+                PetsProduct product = null;
+                try {
+                    String productId = element.attr("id");
+                    Element element1 = element.getElementsByClass("img-block").get(0);
+                    String productLink = HTTPS + element1.select("a").attr("href");
+                    String imageLink = HTTPS + element1.select("a img").attr("src");
+                    String productName = element1.select("a img").attr("alt");
 
-                if (StringUtil.isNotEmpty(productLink)) {
-                    Document productDocument = searchUtil.getDocument(productLink);
-                    if (productDocument == null) {
-                        continue;
-                    }
-                    int begin = productLink.indexOf(".com") + 5;
-                    int end = productLink.indexOf(".html");
-                    String subString = productLink.substring(begin, end);
+                    if (StringUtil.isNotEmpty(productLink)) {
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null) {
+                            continue;
+                        }
+                        int begin = productLink.indexOf(".com") + 5;
+                        int end = productLink.indexOf(".html");
+                        String subString = productLink.substring(begin, end);
 
-                    String pId1 = subString.split("/")[0];
-                    String pId2 = subString.split("/")[1];
+                        String pId1 = subString.split("/")[0];
+                        String pId2 = subString.split("/")[1];
 
-                    String productPriceLink = SUNNING_PRICE_URL;
-                    productPriceLink = productPriceLink.replaceAll("PID1", pId1).replaceAll("PID2", pId2);
+                        String productPriceLink = SUNNING_PRICE_URL;
+                        productPriceLink = productPriceLink.replaceAll("PID1", pId1).replaceAll("PID2", pId2);
 
-                    String priceText = HttpUtil.doGET(productPriceLink);
-                    if (StringUtil.isEmpty(priceText)) {
-                        continue;
-                    }
-
-                    int begin1 = priceText.indexOf("(") + 1;
-                    String priceJsonStr = priceText.substring(begin1, priceText.length() - 2);
-                    JSONArray jsonObj = (JSONArray) JSONObject.parse(priceJsonStr);
-                    if (jsonObj == null || jsonObj.size() == 0) {
-                        continue;
-                    }
-
-                    String productPrice = ((JSONObject) jsonObj.get(0)).getString("price");
-                    if (StringUtil.isEmpty(productPrice)) {
-                        productPrice = "0";
-                    }
-                    String brand = StringUtil.EMPTY;
-                    String brands = "品牌";
-                    String model = "适用";
-                    String model2 = "尺码";
-
-                    String productSpecs = StringUtil.EMPTY;
-                    if (productDocument.getElementsByClass("cnt clearfix") != null) {
-                        Elements fontDoc = productDocument.select("ul[class=cnt clearfix] li");
-                        for (int i = 0; i < fontDoc.size(); i++) {
-                            String text = fontDoc.get(i).text();
-                            if (StringUtil.isEmpty(text)) {
-                                continue;
-                            }
-                            String value = fontDoc.get(i).attr("title");
-                            if (text.contains(brands)) {
-                                brand = value;
-                            }
-                            if (text.contains(model) || text.contains(model2)) {
-                                productSpecs = value;
-                            }
+                        String priceText = HttpUtil.doGET(productPriceLink);
+                        if (StringUtil.isEmpty(priceText)) {
+                            continue;
                         }
 
-                    }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        Elements selected = productDocument.getElementsByClass("clr-item selected");
-                        if (CollectionUtils.isNotEmpty(selected)) {
-                            productSpecs = selected.text();
+                        int begin1 = priceText.indexOf("(") + 1;
+                        String priceJsonStr = priceText.substring(begin1, priceText.length() - 2);
+                        JSONArray jsonObj = (JSONArray) JSONObject.parse(priceJsonStr);
+                        if (jsonObj == null || jsonObj.size() == 0) {
+                            continue;
                         }
-                    }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        Elements selected = productDocument.getElementsByClass("selected");
-                        if (CollectionUtils.isNotEmpty(selected)) {
-                            productSpecs = selected.text();
-                        }
-                    }
-                    String productUnit = StringUtil.EMPTY;
-                    if (StringUtil.isNotEmpty(productSpecs)) {
-                        productUnit = productSpecs;
-                    }
 
-                    PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                        String productPrice = ((JSONObject) jsonObj.get(0)).getString("price");
+                        if (StringUtil.isEmpty(productPrice)) {
+                            productPrice = "0";
+                        }
+                        String brand = StringUtil.EMPTY;
+                        String brands = "品牌";
+                        String model = "适用";
+                        String model2 = "尺码";
+
+                        String productSpecs = StringUtil.EMPTY;
+                        if (productDocument.getElementsByClass("cnt clearfix") != null) {
+                            Elements fontDoc = productDocument.select("ul[class=cnt clearfix] li");
+                            for (int i = 0; i < fontDoc.size(); i++) {
+                                String text = fontDoc.get(i).text();
+                                if (StringUtil.isEmpty(text)) {
+                                    continue;
+                                }
+                                String value = fontDoc.get(i).attr("title");
+                                if (text.contains(brands)) {
+                                    brand = value;
+                                }
+                                if (text.contains(model) || text.contains(model2)) {
+                                    productSpecs = value;
+                                }
+                            }
+
+                        }
+                        if (StringUtil.isEmpty(productSpecs)) {
+                            Elements selected = productDocument.getElementsByClass("clr-item selected");
+                            if (CollectionUtils.isNotEmpty(selected)) {
+                                productSpecs = selected.text();
+                            }
+                        }
+                        if (StringUtil.isEmpty(productSpecs)) {
+                            Elements selected = productDocument.getElementsByClass("selected");
+                            if (CollectionUtils.isNotEmpty(selected)) {
+                                productSpecs = selected.text();
+                            }
+                        }
+                        String productUnit = StringUtil.EMPTY;
+                        if (StringUtil.isNotEmpty(productSpecs)) {
+                            productUnit = productSpecs;
+                        }
+
+                        product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
                     products.add(product);
                 }
             }

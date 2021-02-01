@@ -105,58 +105,66 @@ public class JDService extends AbstractPetsCall {
         if (CollectionUtils.isNotEmpty(document.getElementsByClass("gl-warp clearfix"))
                 && CollectionUtils.isNotEmpty(document.getElementsByClass("gl-warp clearfix").get(0).children())) {
             Elements productList = document.getElementsByClass("gl-warp clearfix").get(0).children();
+            PetsProduct product = null;
             for (Element element : productList) {
-                String productId = element.attr("data-sku");
-                String productLink = HTTPS + element.select("div[class='p-img'] a").attr("href");
-                String imageLink = HTTPS + element.select("div[class='p-img'] a img").attr("data-lazy-img");
-                String productPrice = StringUtil.EMPTY;
-                if (element.getElementsByClass("p-price") != null) {
-                    String price_n = element.getElementsByClass("p-price").get(0).text();
-                    productPrice = price_n.replaceAll("¥", "").replaceAll("￥", "");
-                    String[] s = productPrice.split(" ");
-                    productPrice = s[0];
-                }
-                if (StringUtil.isNotEmpty(productLink)) {
-                    Document productDocument = searchUtil.getDocument(productLink);
-                    if (productDocument == null) {
-                        continue;
+                try {
+                    String productId = element.attr("data-sku");
+                    String productLink = HTTPS + element.select("div[class='p-img'] a").attr("href");
+                    String imageLink = HTTPS + element.select("div[class='p-img'] a img").attr("data-lazy-img");
+                    String productPrice = StringUtil.EMPTY;
+                    if (element.getElementsByClass("p-price") != null) {
+                        String price_n = element.getElementsByClass("p-price").get(0).text();
+                        productPrice = price_n.replaceAll("¥", "").replaceAll("￥", "");
+                        String[] s = productPrice.split(" ");
+                        productPrice = s[0];
                     }
-                    String productName = productDocument.getElementsByClass("sku-name").text();
+                    if (StringUtil.isNotEmpty(productLink)) {
+                        Document productDocument = searchUtil.getDocument(productLink);
+                        if (productDocument == null) {
+                            continue;
+                        }
+                        String productName = productDocument.getElementsByClass("sku-name").text();
 
-                    String brand = StringUtil.EMPTY;
-                    if (null != productDocument.getElementById("parameter-brand")) {
-                        brand = productDocument.getElementById("parameter-brand").text();
-                        brand = brand.replaceAll("品牌：", "");
-                        brand = brand.trim();
-                    }
-                    String model = "毛重";
-                    String model2 = "规格";
+                        String brand = StringUtil.EMPTY;
+                        if (null != productDocument.getElementById("parameter-brand")) {
+                            brand = productDocument.getElementById("parameter-brand").text();
+                            brand = brand.replaceAll("品牌：", "");
+                            brand = brand.trim();
+                        }
+                        String model = "毛重";
+                        String model2 = "规格";
 
-                    String productSpecs = StringUtil.EMPTY;
-                    if (null != productDocument.getElementsByClass("item  selected")) {
-                        productSpecs = productDocument.getElementsByClass("item  selected").text();
-                    }
-                    if (StringUtil.isEmpty(productSpecs)) {
-                        if (productDocument.getElementsByClass("parameter2 p-parameter-list") != null) {
-                            Elements fontDoc = productDocument.select("ul[class=parameter2 p-parameter-list] li");
-                            for (int i = 0; i < fontDoc.size(); i++) {
-                                String text = fontDoc.get(i).text();
-                                if (StringUtil.isEmpty(text)) {
-                                    continue;
-                                }
-                                if (text.contains(model) || text.contains(model2)) {
-                                    productSpecs = text;
+                        String productSpecs = StringUtil.EMPTY;
+                        if (null != productDocument.getElementsByClass("item  selected")) {
+                            productSpecs = productDocument.getElementsByClass("item  selected").text();
+                        }
+                        if (StringUtil.isEmpty(productSpecs)) {
+                            if (productDocument.getElementsByClass("parameter2 p-parameter-list") != null) {
+                                Elements fontDoc = productDocument.select("ul[class=parameter2 p-parameter-list] li");
+                                for (int i = 0; i < fontDoc.size(); i++) {
+                                    String text = fontDoc.get(i).text();
+                                    if (StringUtil.isEmpty(text)) {
+                                        continue;
+                                    }
+                                    if (text.contains(model) || text.contains(model2)) {
+                                        productSpecs = text;
+                                    }
                                 }
                             }
                         }
+                        if (StringUtil.isNotEmpty(productSpecs) && productSpecs.contains("：")) {
+                            String key = productSpecs.split("：")[0];
+                            productSpecs = productSpecs.replaceAll(key, "");
+                            productSpecs = productSpecs.replaceAll("：", "");
+                        }
+                        String productUnit = productSpecs;
+                        product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+
                     }
-                    if (StringUtil.isNotEmpty(productSpecs) && productSpecs.contains("：")) {
-                        String key = productSpecs.split("：")[0];
-                        productSpecs = productSpecs.replaceAll(key, "");
-                        productSpecs = productSpecs.replaceAll("：", "");
-                    }
-                    String productUnit = productSpecs;
-                    PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (null != product) {
                     products.add(product);
                 }
             }

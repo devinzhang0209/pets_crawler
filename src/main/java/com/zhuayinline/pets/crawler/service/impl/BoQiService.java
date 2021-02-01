@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -105,40 +106,46 @@ public class BoQiService extends AbstractPetsCall {
         Document document = searchUtil.getDocument(categoryProductUrl);
         Elements productList = document.getElementsByClass("product_list_container");
         for (Element element : productList) {
-            String productLink = element.child(0).attr("href");
-            String imageLink = element.child(0).tagName("img").child(0).attr("data-original");
-            if (StringUtil.isNotEmpty(productLink)) {
-                Document productDocument = searchUtil.getDocument(productLink);
-                if (productDocument == null || productDocument.getElementById("goodname") == null) {
-                    continue;
-                }
-                String productName = productDocument.getElementById("goodname").val();
-                String productPrice = productDocument.getElementById("yhhcast").val();
-                String brand = productDocument.getElementsByClass("brand").first().getElementsByTag("a").first().text();
-                String productSpecs = productDocument.getElementsByClass("change current").text();
-                if (StringUtil.isEmpty(productSpecs)) {
-                    try {
-                        productSpecs = productDocument.getElementsByClass("property").first().getElementsByTag("td").get(1).getElementsByTag("span").text();
-                    } catch (Exception e) {
-
+            PetsProduct product = null;
+            try {
+                String productLink = element.child(0).attr("href");
+                String imageLink = element.child(0).tagName("img").child(0).attr("data-original");
+                if (StringUtil.isNotEmpty(productLink)) {
+                    Document productDocument = searchUtil.getDocument(productLink);
+                    if (productDocument == null || productDocument.getElementById("goodname") == null) {
+                        continue;
                     }
-                }
-                String productUnit = StringUtil.EMPTY;
-                if (StringUtil.isNotEmpty(productSpecs)) {
-                    productUnit = productSpecs;
-                }
+                    String productName = productDocument.getElementById("goodname").val();
+                    String productPrice = productDocument.getElementById("yhhcast").val();
+                    String brand = productDocument.getElementsByClass("brand").first().getElementsByTag("a").first().text();
+                    String productSpecs = productDocument.getElementsByClass("change current").text();
+                    if (StringUtil.isEmpty(productSpecs)) {
+                        try {
+                            productSpecs = productDocument.getElementsByClass("property").first().getElementsByTag("td").get(1).getElementsByTag("span").text();
+                        } catch (Exception e) {
 
-                String productId = "";
-                String patternStr = "-[0-9]*.html";
-                Pattern pattern = Pattern.compile(patternStr);
-                Matcher matcher = pattern.matcher(productLink);
-                if (matcher.find()) {
-                    productId = matcher.group();
-                    productId = productId.replaceAll(".html", "").replaceAll("-", "");
-                }
+                        }
+                    }
+                    String productUnit = StringUtil.EMPTY;
+                    if (StringUtil.isNotEmpty(productSpecs)) {
+                        productUnit = productSpecs;
+                    }
 
-                PetsProduct product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
-                products.add(product);
+                    String productId = "";
+                    String patternStr = "-[0-9]*.html";
+                    Pattern pattern = Pattern.compile(patternStr);
+                    Matcher matcher = pattern.matcher(productLink);
+                    if (matcher.find()) {
+                        productId = matcher.group();
+                        productId = productId.replaceAll(".html", "").replaceAll("-", "");
+                    }
+                    product = buildProduct(productId, category, productName, brand, productUnit, imageLink, productLink, productPrice, productSpecs);
+                }
+                if (null != product) {
+                    products.add(product);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return products;

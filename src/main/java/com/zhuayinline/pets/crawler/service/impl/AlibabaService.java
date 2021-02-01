@@ -158,10 +158,10 @@ public class AlibabaService extends AbstractPetsCall {
     @Override
     public String search() {
         try {
-            if (runing.get(getSource()) != null) {
+            if (runing.get(getCategoryBaseUrl()) != null) {
                 return "上一次爬取还未运行结束";
             }
-            runing.put(getSource(), getSource());
+            runing.put(getCategoryBaseUrl(), getCategoryBaseUrl());
             List<Category> allCategory = getAllCategory();
             if (CollectionUtils.isNotEmpty(allCategory)) {
                 for (Category category : allCategory) {
@@ -188,11 +188,10 @@ public class AlibabaService extends AbstractPetsCall {
                     saveProduct(petsProductMapper, products);
                 }
             }
-
+            runing.remove(getCategoryBaseUrl());
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            runing.remove(getSource());
+            runing.remove(getCategoryBaseUrl());
         }
         return "爬取成功";
     }
