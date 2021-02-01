@@ -48,7 +48,7 @@ public class SearchUtil {
             }
         }
         try {
-            Thread.sleep(2 * 1000);
+            Thread.sleep(3 * 1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

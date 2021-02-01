@@ -70,7 +70,7 @@ public abstract class AbstractPetsCall {
                     try {
                         products.addAll(getProducts(category, category.getCategoryLink()));
                         if (getSource().equals(Website.TMALLANDTAOBAO.getWebsiteName())) {
-                            Thread.sleep(25 * 1000);
+                            Thread.sleep(35 * 1000);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -88,10 +88,11 @@ public abstract class AbstractPetsCall {
                                 System.out.println("begin to search the " + page + " page");
                                 products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
                                 if (getSource().equals(Website.TMALLANDTAOBAO.getWebsiteName())) {
-                                    Thread.sleep(25 * 1000);
+                                    Thread.sleep(35 * 1000);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                Thread.sleep(10 * 1000);
                             }
                             //submit
                             if (page % 3 == 0) {

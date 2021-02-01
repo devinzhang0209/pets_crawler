@@ -23,10 +23,10 @@ public class HttpUtil {
         try {
             // 连接超时
             httpclient.getParams().setParameter(
-                    CoreConnectionPNames.CONNECTION_TIMEOUT, 5000);
+                    CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
             // 读取超时
             httpclient.getParams().setParameter(
-                    CoreConnectionPNames.SO_TIMEOUT, 5000);
+                    CoreConnectionPNames.SO_TIMEOUT, 30000);
 
             HttpGet hg = new HttpGet(url);
             //模拟浏览器
