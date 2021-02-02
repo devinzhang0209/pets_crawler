@@ -43,6 +43,8 @@ public class PetsProductController {
     private JDService jdService;
     @Resource
     private TMallAndTaobaoService manManMaiService;
+    @Resource
+    private ZhiDeMaiService zhiDeMaiService;
 
     @GetMapping("/begin")
     public String callBoQi(String action) throws Exception {
@@ -70,9 +72,9 @@ public class PetsProductController {
         } else if (action.equalsIgnoreCase(Website.JD.name())) {
             service = jdService;
         } else if (action.equalsIgnoreCase(Website.TMALL.name())) {
-            service = manManMaiService;
+            service = zhiDeMaiService;
         } else if (action.equalsIgnoreCase(Website.TAOBAO.name())) {
-            service = manManMaiService;
+            service = zhiDeMaiService;
         }
         if (null == service) {
             return Result.failResult("action not found");

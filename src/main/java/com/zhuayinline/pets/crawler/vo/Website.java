@@ -15,7 +15,8 @@ public enum Website {
     JD("京东", "https://www.jd.com/", "https://www.jd.com/allSort.aspx"),
     SUNING("苏宁", "https://suning.com/", "https://list.suning.com/"),
     DANGDANG("当当", "http://dangdang.com/", "http://category.dangdang.com/"),
-    TMALLANDTAOBAO("过客网", "http://www.tool168.cn/", "https://wq.jd.com/bases/searchdropdown/getdropdown?callback=jQuery18106165038653619641_1612103180970&terminal=m&zip=1&key=chongwu&_=1612103198560&sceneval=2&callback=jsonpCBKE&_=1612103198560");
+    TMALLANDTAOBAO("过客网", "http://www.tool168.cn/", "https://wq.jd.com/bases/searchdropdown/getdropdown?callback=jQuery18106165038653619641_1612103180970&terminal=m&zip=1&key=chongwu&_=1612103198560&sceneval=2&callback=jsonpCBKE&_=1612103198560"),
+    ZHIDEMAI("值得买", "smzdm.com", "https://search.smzdm.com/ajax/suggestion/suggestion_jsonp?callback=jQuery112400861389211446697_1612277085324&keyword=%E5%AE%A0%E7%89%A9&_=1612277085338");
 
     Website(String websiteName, String websiteUrl, String baseCategoryUrl) {
         this.websiteName = websiteName;
