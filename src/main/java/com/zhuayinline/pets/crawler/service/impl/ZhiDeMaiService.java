@@ -18,9 +18,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Devin Zhang
@@ -80,6 +78,7 @@ public class ZhiDeMaiService extends AbstractPetsCall {
             categories.add(categoryModel2);
             categories.add(categoryModel3);
         }
+        Collections.reverse(categories);
         return categories;
     }
 
