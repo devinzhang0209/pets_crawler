@@ -76,6 +76,7 @@ public abstract class AbstractPetsCall {
                         e.printStackTrace();
                     }
 
+                    int flag = 0;
                     if (pageSize > 1) {
                         //for 20floor
                         Map<String, String> otherParams = new HashMap();
@@ -86,7 +87,16 @@ public abstract class AbstractPetsCall {
                         for (int page = 2; page <= pageSize; page++) {
                             try {
                                 System.out.println("begin to search the " + page + " page");
-                                products.addAll(getProducts(category, getPageLink(page, category, otherParams)));
+                                List<PetsProduct> list = getProducts(category, getPageLink(page, category, otherParams));
+                                if (getSource().equals(Website.ZHIDEMAI.getWebsiteName())) {
+                                    if (CollectionUtils.isEmpty(list)) {
+                                        flag++;
+                                    }
+                                }
+                                if (flag == 5) {
+                                    break;
+                                }
+                                products.addAll(list);
                                 if (getSource().equals(Website.TMALLANDTAOBAO.getWebsiteName())) {
                                     Thread.sleep(35 * 1000);
                                 }
